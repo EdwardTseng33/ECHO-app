@@ -344,7 +344,14 @@ function completeRegistration() {
     a.name = name;
     if (age) a.age = age;
     if (loc) a.location = cleanLocation(loc);
-    if (currentAvatarUrl) a.avatarUrl = currentAvatarUrl;
+    if (currentAvatarUrl) {
+        a.avatarUrl = currentAvatarUrl;
+    } else {
+        // Save selected character preset
+        a.charPreset = selectedCharPreset;
+        const preset = CHAR_PRESETS.find(c => c.id === selectedCharPreset);
+        if (preset) a.avatarUrl = preset.img;
+    }
 
     saveGlobal();
     showCelebration('📸', `歡迎冒險者 ${name}！`, '冒險即將開始…');
@@ -440,6 +447,43 @@ async function handleProfileAvatarUpload(event) {
     }
 }
 
+function openCharPresetPicker() {
+    const a = me(); if (!a) return;
+    const current = a.charPreset || 'mage';
+    let html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 0;">';
+    CHAR_PRESETS.forEach(c => {
+        const sel = c.id === current;
+        html += `<div onclick="applyCharPreset('${c.id}')" style="cursor:pointer;text-align:center;padding:10px 4px;border-radius:16px;border:3px solid ${sel ? 'var(--primary)' : 'transparent'};background:${sel ? 'rgba(99,102,241,0.08)' : 'var(--surface)'};transition:all 0.2s;">
+            <img src="${c.img}" style="width:52px;height:52px;object-fit:contain;border-radius:50%;${sel ? 'filter:drop-shadow(0 0 8px rgba(99,102,241,0.5))' : ''}">
+            <div style="font-size:11px;font-weight:800;color:${sel ? 'var(--primary)' : 'var(--text2)'};margin-top:4px;">${c.name}</div>
+        </div>`;
+    });
+    html += '</div>';
+    const overlay = document.createElement('div');
+    overlay.id = 'char-preset-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
+    overlay.innerHTML = `<div style="background:var(--bg);border-radius:24px;padding:24px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;">
+        <div style="font-size:16px;font-weight:900;color:var(--text);margin-bottom:12px;">🎭 更換冒險角色</div>
+        ${html}
+        <button onclick="document.getElementById('char-preset-overlay').remove()" style="margin-top:12px;width:100%;padding:12px;border-radius:12px;background:var(--surface);color:var(--text2);font-weight:800;border:none;cursor:pointer;">取消</button>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+function applyCharPreset(id) {
+    const a = me(); if (!a) return;
+    const preset = CHAR_PRESETS.find(c => c.id === id);
+    if (!preset) return;
+    a.charPreset = id;
+    a.avatarUrl = preset.img;
+    saveGlobal();
+    refreshProfile();
+    refreshHUD();
+    const overlay = document.getElementById('char-preset-overlay');
+    if (overlay) overlay.remove();
+    showToast('✨ 角色已更換為「' + preset.name + '」！');
+}
+
 async function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -511,9 +555,40 @@ function getCharEmoji(charDef, level) {
 }
 const DEFAULT_AVATAR = 'img/chars/mage.png';
 
+// Character selection presets
+const CHAR_PRESETS = [
+    { id: 'mage', name: '法師', img: 'img/chars/mage.png' },
+    { id: 'warrior', name: '戰士', img: 'img/chars/warrior.png' },
+    { id: 'ranger', name: '弓箭手', img: 'img/chars/ranger.png' },
+    { id: 'elf', name: '精靈', img: 'img/chars/elf.png' },
+    { id: 'ninja', name: '忍者', img: 'img/chars/ninja.png' },
+    { id: 'dragon', name: '龍族', img: 'img/chars/dragon.png' },
+    { id: 'charmander', name: '小火龍', img: 'img/chars/charmander.png' },
+    { id: 'slime', name: '史萊姆', img: 'img/chars/slime.png' },
+];
+let selectedCharPreset = 'mage';
+
+function renderCharSelectGrid() {
+    const grid = document.getElementById('char-select-grid');
+    if (!grid) return;
+    grid.innerHTML = CHAR_PRESETS.map(c => `
+        <div onclick="selectCharPreset('${c.id}')" style="cursor:pointer; text-align:center; padding:8px 4px; border-radius:16px; border:3px solid ${selectedCharPreset === c.id ? 'var(--primary)' : 'transparent'}; background:${selectedCharPreset === c.id ? 'rgba(99,102,241,0.08)' : 'var(--surface)'}; transition:all 0.2s;">
+            <img src="${c.img}" style="width:56px;height:56px;object-fit:contain;border-radius:50%;${selectedCharPreset === c.id ? 'filter:drop-shadow(0 0 8px rgba(99,102,241,0.5))' : ''}">
+            <div style="font-size:11px;font-weight:800;color:${selectedCharPreset === c.id ? 'var(--primary)' : 'var(--text2)'};margin-top:4px;">${c.name}</div>
+        </div>
+    `).join('');
+}
+
+function selectCharPreset(id) {
+    selectedCharPreset = id;
+    const preset = CHAR_PRESETS.find(c => c.id === id);
+    if (preset) currentAvatarUrl = null; // Clear custom upload if selecting preset
+    renderCharSelectGrid();
+}
+
 function getCharImg(charDef, size = 48, level = 1, isAnimated = true) {
     const a = typeof charDef === 'string' ? globalData.accounts[charDef] : charDef;
-    const src = (a && a.avatarUrl) ? a.avatarUrl : DEFAULT_AVATAR;
+    const src = (a && a.avatarUrl) ? a.avatarUrl : (a && a.charPreset ? CHAR_PRESETS.find(c => c.id === a.charPreset)?.img || DEFAULT_AVATAR : DEFAULT_AVATAR);
     const animClass = isAnimated ? 'avatar-animated' : '';
     return `<img src="${src}" class="${animClass}" style="width:${size}px;height:${size}px;object-fit:contain; border-radius:50%">`;
 }
@@ -687,6 +762,7 @@ function showScreen(id) {
     if (id === 'screen-character') refreshProfile();
     if (id === 'screen-subscription') refreshSubPage();
     if (id === 'screen-create') resetCreateForm();
+    if (id === 'screen-auth-step2') renderCharSelectGrid();
 }
 function nav(id, btn) {
 
