@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ECHO 回聲 | 冒險者計畫</title>
+    <meta name="description" content="ECHO 回聲 — 用 RPG 冒險方式，讓冒險者愛上承接委託！遊戲化任務平台。">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/bold/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Background Removal Utility -->
+    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/background-removal.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- ===== AUTH STEP 1: LOGIN PAGE ===== -->
+        <div class="screen" id="screen-auth">
+            <div class="auth-screen auth-step1">
+                <!-- Floating particles -->
+                <div class="auth-particles">
+                    <div class="auth-particle"></div>
+                    <div class="auth-particle"></div>
+                    <div class="auth-particle"></div>
+                    <div class="auth-particle"></div>
+                    <div class="auth-particle"></div>
+                    <div class="auth-particle"></div>
+                </div>
+
+                <!-- Logo Section -->
+                <div class="auth-logo-section">
+                    <div class="auth-logo-ring">
+                        <div class="auth-logo-icon">⚔️</div>
+                    </div>
+                    <h1 class="auth-brand-title">ECHO <span class="auth-brand-sub">回聲</span></h1>
+                    <div class="auth-tagline">
+                        <span class="auth-tagline-line">讓成長，變成一場</span>
+                        <span class="auth-tagline-highlight">大冒險</span>
+                    </div>
+                    <p class="auth-tagline-desc">冒險互動・委託挑戰・冒險者成長</p>
+                </div>
+
+                <!-- Login Form -->
+                <div class="auth-form-card">
+                    <div class="auth-form-inner">
+                        <div class="form-group">
+                            <label><i class="ph-bold ph-envelope-simple"></i> 契約 Email</label>
+                            <input id="auth-email" type="email" placeholder="your@email.com" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="ph-bold ph-lock-key"></i> 密碼</label>
+                            <input id="auth-password" type="password" placeholder="輸入密碼"
+                                autocomplete="current-password">
+                        </div>
+                        <button class="btn btn-primary btn-block auth-login-btn" onclick="doLoginStep1()">
+                            <i class="ph-bold ph-sign-in"></i> 登入 / 註冊
+                        </button>
+                    </div>
+
+                    <div class="auth-divider"><span>或</span></div>
+
+                    <button class="btn btn-google btn-block" onclick="doGoogleLogin()">
+                        <svg viewBox="0 0 48 48" width="20" height="20">
+                            <path fill="#EA4335"
+                                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                            <path fill="#4285F4"
+                                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                            <path fill="#FBBC05"
+                                d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.9 23.9 0 000 24c0 3.77.9 7.34 2.44 10.51l8.09-5.92z" />
+                            <path fill="#34A853"
+                                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-8.09 5.92C6.51 42.62 14.62 48 24 48z" />
+                        </svg>
+                        使用 Google 登入
+                    </button>
+                </div>
+
+                <div class="auth-footer">
+                    <span>開始即代表同意</span>
+                    <a href="#">服務條款</a> 與 <a href="#">隱私政策</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== AUTH STEP 2: PROFILE SETUP ===== -->
+        <div class="screen hidden" id="screen-auth-step2">
+            <div class="auth-screen auth-step2">
+                <div class="auth-step2-header">
+                    <div style="font-size:40px;margin-bottom:4px;">🎮</div>
+                    <h2 class="auth-step2-title">建立你的冒險者檔案</h2>
+                    <p class="auth-step2-subtitle">告訴我們一些你的資訊，讓冒險開始吧！</p>
+                </div>
+
+                <div class="auth-step2-form">
+                    <div class="card" style="padding:16px;">
+                        <div class="form-group">
+                            <label>✏️ 冒險者名稱</label>
+                            <input id="auth-name" placeholder="輸入你的名字" autocomplete="name">
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                            <div class="form-group mb-0">
+                                <label>🎂 年齡</label>
+                                <input id="auth-age" type="number" placeholder="10" min="1" max="100">
+                            </div>
+                            <div class="form-group mb-0">
+                                <label>📍 居住地區</label>
+                                <input id="auth-loc" placeholder="台灣, 台北">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <div
+                            style="font-size:14px;font-weight:900;color:var(--text);margin-bottom:12px;padding-left:4px;">
+                            📸 上傳你的冒險頭像 <span style="font-size:11px; color:var(--text3); font-weight:700;">(選填)</span>
+                        </div>
+                        <div class="avatar-upload-container" onclick="document.getElementById('avatar-input').click()"
+                            style="width:120px; height:120px; border:2px dashed var(--border); border-radius:60px; margin:0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; position:relative; background:var(--surface);">
+                            <div id="avatar-preview" style="display:flex; flex-direction:column; align-items:center;">
+                                <i class="ph-bold ph-camera" style="font-size:32px; color:var(--text3)"></i>
+                                <span style="font-size:12px; color:var(--text3); margin-top:8px;">點擊上傳</span>
+                            </div>
+                            <input type="file" id="avatar-input" hidden accept="image/*"
+                                onchange="handleAvatarUpload(event)">
+                        </div>
+                        <div id="upload-status"
+                            style="font-size:12px; text-align:center; margin-top:8px; color:var(--primary); display:none; font-weight:700;">
+                            ✨ 正在為您去除背景...
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block"
+                        style="margin-top:20px;padding:16px;font-size:16px;border-radius:16px;"
+                        onclick="completeRegistration()">
+                        <i class="ph-bold ph-rocket-launch"></i> 開始冒險！
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ACCOUNT SETTINGS SCREEN ===== -->
+        <div id="screen-account" class="screen hidden">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-character'); refreshProfile()">
+                    <i class="ph-bold ph-arrow-left"></i>
+                </button>
+                <h1>冒險者檔案與契約中心</h1>
+                <div style="width:36px"></div>
+            </div>
+            <div style="padding:16px;">
+                <p style="color:var(--text2);font-size:13px;font-weight:700;margin-top:8px;margin-bottom:16px">
+                    守護您的冒險者檔案與成就契約</p>
+                <div class="menu-list">
+                    <div class="menu-item" onclick="document.getElementById('acc-avatar-input').click()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-camera" style="color:#34d399"></i> 更換冒險者頭像
+                        </div>
+                        <span class="menu-right">修改 <i class="ph ph-caret-right"></i></span>
+                        <input type="file" id="acc-avatar-input" hidden accept="image/*"
+                            onchange="handleProfileAvatarUpload(event)">
+                    </div>
+                    <div class="menu-item" onclick="editUsername()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-user-circle" style="color:var(--primary)"></i> 冒險者稱號
+                        </div>
+                        <span class="menu-right"><span id="acc-username"
+                                style="color:var(--text); font-weight:800;">冒險者</span> <i
+                                class="ph ph-caret-right"></i></span>
+                    </div>
+                    <div class="menu-item" onclick="editAge()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-cake" style="color:#F59E0B"></i> 年齡
+                        </div>
+                        <span class="menu-right"><span id="acc-age"
+                                style="color:var(--text); font-weight:800;">10</span> 歲 <i
+                                class="ph ph-caret-right"></i></span>
+                    </div>
+                    <div class="menu-item" style="cursor:default; background:var(--bg);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-envelope-simple" style="color:var(--text2)"></i> 契約聯絡 Email
+                        </div>
+                        <span class="menu-right" id="acc-email"
+                            style="font-size:13px; color:var(--text2); font-family:monospace;">user@echo.com</span>
+                    </div>
+                    <div class="menu-item" onclick="toggleGoogleBind()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-google-logo" style="color:#DB4437"></i> 魔法通訊 (Google) 綁定
+                        </div>
+                        <span class="menu-right" id="acc-google-status" style="color:var(--text3);">未連結 <i
+                                class="ph ph-caret-right"></i></span>
+                    </div>
+                    <div class="menu-item" onclick="changePasswordFlow()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-lock-key" style="color:#a855f7"></i> 變更密碼
+                        </div>
+                        <span class="menu-right">設定 <i class="ph ph-caret-right"></i></span>
+                    </div>
+                    <div class="menu-item" onclick="editLocation()">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ph-map-pin" style="color:#10b981"></i> 所在地
+                        </div>
+                        <span class="menu-right"><span id="acc-location"
+                                style="color:var(--primary); font-weight:700;">台灣, 台北</span> <i
+                                class="ph ph-caret-right"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HOME (TASK WALL) ===== -->
+        <div class="screen hidden" id="screen-home">
+            <div class="topbar" style="border-bottom:none; padding-bottom: 0px; min-height: 0px; padding-top: 0px;">
+                <!-- Title removed as per user request -->
+            </div>
+            <div class="home-profile-card"
+                style="position:relative; flex-direction:column; gap:12px; padding:24px; margin: 16px 16px 20px; border-radius:18px; background: linear-gradient(135deg, var(--surface), #ffffff); border: 1px solid var(--border);">
+                <div style="display:flex; width:100%; align-items:center; gap:20px;">
+                    <div class="home-avatar" id="hud-char-icon"
+                        style="width:90px; height:90px; min-width:90px; border-radius:50%; background:var(--bg); border:3px solid var(--primary); display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow: 0 8px 16px rgba(99,102,241,0.15);">
+                        🧙</div>
+                    <div class="home-profile-info" style="flex:1;">
+                        <div
+                            style="font-size:13px; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">
+                            傳奇冒險者</div>
+                        <div class="home-greeting"
+                            style="font-size:22px; font-weight:900; color:var(--text); line-height:1.2; margin-bottom:10px;">
+                            <span id="hud-charname">冒險者</span>，<br>歡迎回來！
+                        </div>
+                        <div id="hud-guild-badge" class="guild-inline-badge" style="display:none; margin-bottom:8px;">
+                        </div>
+                        <div class="xp-section" style="margin: 0; padding:0;">
+                            <div class="xp-header"
+                                style="margin-bottom: 6px; display:flex; justify-content:space-between; align-items:baseline;">
+                                <span class="home-stat-badge level"
+                                    style="width:auto; padding:2px 10px; font-size:11px; background:var(--primary); color:white; border:none; margin-right:8px;"><i
+                                        class="ph-fill ph-star"></i> Lv.<span id="hud-level">1</span></span>
+                                <span id="xp-current"
+                                    style="font-weight: 800; font-size:11px; flex:1; color:var(--text2);">0 / 50
+                                    XP</span>
+                                <span class="xp-lvl" id="xp-next"
+                                    style="font-size: 11px; color:var(--text3); font-weight:700;">→ Lv.2</span>
+                            </div>
+                            <div class="xp-track"
+                                style="height: 10px; border-radius: 5px; background:rgba(0,0,0,0.05);">
+                                <div class="xp-fill" id="xp-fill"
+                                    style="width:0%; border-radius: 5px; background: linear-gradient(90deg, var(--primary), #a855f7);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="char-dialogue-bubble" id="home-char-bubble"
+                        style="transform: scale(0.9); max-width:180px;"></div>
+                </div>
+
+                <div class="home-stats-row" style="grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:8px;">
+                    <div class="home-stat-badge points" style="padding:8px 4px; flex-direction:column; gap:2px;"><i
+                            class="ph-bold ph-coin" style="font-size:16px;"></i>
+                        <span id="hud-points" style="font-size:14px;">0</span>
+                    </div>
+                    <div class="home-stat-badge"
+                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3)">
+                        <i class="ph-bold ph-flask" style="font-size:16px;"></i> <span id="hud-potions"
+                            style="font-size:14px; font-weight:900;">0</span>
+                    </div>
+                    <div class="home-stat-badge"
+                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(255, 107, 0, 0.15); color: #FF6B00; border: 1px solid rgba(255, 107, 0, 0.3)">
+                        <i class="ph-bold ph-sword" style="font-size:16px;"></i> <span id="hud-atk"
+                            style="font-size:14px;">15</span>
+                    </div>
+                    <div class="home-stat-badge"
+                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(0, 229, 255, 0.15); color: #00E5FF; border: 1px solid rgba(0, 229, 255, 0.3)">
+                        <i class="ph-bold ph-shield" style="font-size:16px;"></i> <span id="hud-def"
+                            style="font-size:14px;">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Battle Banner -->
+            <div style="padding:0 16px 8px">
+                <div class="battle-banner" id="battle-banner" onclick="startDailyBattle()">
+                    <div class="battle-banner-bg"></div>
+                    <div class="battle-banner-content">
+                        <div class="battle-left">
+                            <div class="battle-label">🏰 無盡爬塔挑戰</div>
+                            <div class="battle-monster-name" id="daily-monster-name">突破極限</div>
+                            <div class="battle-hint" id="daily-battle-hint">點擊開始攀登！</div>
+                        </div>
+                        <div class="battle-monster-emoji" id="daily-monster-emoji">👹</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lucky Wheel Banner -->
+            <div style="padding:0 16px 8px">
+                <div class="card" style="cursor:pointer;border-color:rgba(255,215,0,.3)" onclick="openLuckyWheel()">
+                    <div class="flex items-center gap-2">
+                        <span style="font-size:32px;animation:charFloat 2s ease-in-out infinite">🎡</span>
+                        <div style="flex:1">
+                            <div style="font-weight:900;font-size:14px;color:var(--primary)">每日幸運轉盤</div>
+                            <div style="font-size:11px;color:var(--text2);font-weight:700" id="wheel-hint">今天還沒轉！免費一次
+                            </div>
+                        </div>
+                        <span style="font-size:18px">→</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>委託看板</h2>
+                <a href="#" onclick="showScreen('screen-create')">+ 發布委託</a>
+            </div>
+            <div class="section-pad" id="task-feed"></div>
+        </div>
+
+        <!-- ===== MY TASKS ===== -->
+        <div class="screen hidden" id="screen-mytasks">
+            <div class="topbar">
+                <h1>冒險者勳章</h1>
+                <div></div>
+            </div>
+            <div class="section-header">
+                <h2>進行中</h2>
+                <div></div>
+            </div>
+            <div class="section-pad" id="mytasks-active"></div>
+            <div class="section-header">
+                <h2>已完成</h2>
+                <div></div>
+            </div>
+            <div class="section-pad" id="mytasks-done"></div>
+        </div>
+
+        <!-- ===== TASK DETAIL ===== -->
+        <div class="screen hidden" id="screen-detail">
+            <div class="topbar">
+                <button class="icon-btn" onclick="goBackFromDetail()"><i class="ph-bold ph-arrow-left"></i></button>
+                <span id="det-badge" class="status-badge status-published">開放中</span>
+            </div>
+            <div class="detail-header">
+                <div id="det-type" class="task-type">任務</div>
+                <h2 id="det-title">任務名稱</h2>
+                <div class="flex gap-2 mt-2" style="font-size:12px;color:var(--text2);font-weight:700">
+                    <span><i class="ph-fill ph-user-circle"></i> <span id="det-creator">發布者</span></span>
+                    <span><i class="ph-fill ph-clock"></i> <span id="det-time">剛剛</span></span>
+                </div>
+            </div>
+            <div class="detail-body">
+                <p id="det-desc">任務說明</p>
+                <div id="det-meta-extra"></div>
+                <div class="detail-rewards">
+                    <div class="reward-chip"><i class="ph-bold ph-lightning"
+                            style="font-size:14px; color:var(--primary);"></i> <span class="val" id="det-xp">50</span>
+                        XP</div>
+                    <div class="reward-chip"><i class="ph-bold ph-coin"
+                            style="font-size:14px; color:var(--primary);"></i> <span class="val" id="det-pts">10</span>
+                    </div>
+                </div>
+                <div id="det-checklist"></div>
+                <div id="echo-section" style="display:none">
+                    <h3 style="font-size:14px;font-weight:900;margin-top:16px">🔊 回聲鼓勵</h3>
+                    <div id="echo-container"></div>
+                </div>
+                <div id="record-section" style="display:none">
+                    <div class="record-area">
+                        <h3 style="font-size:14px;font-weight:900;margin-bottom:12px">🎤 錄製回聲鼓勵</h3>
+                        <div id="rec-status"
+                            style="font-size: 11px; font-weight: 800; color: var(--text3); margin-bottom: 12px;">
+                            準備好後點擊錄音</div>
+                        <button class="record-btn" id="record-btn" onclick="toggleRecording()"><i id="rec-icon"
+                                class="ph-fill ph-microphone"></i></button>
+                        <div class="record-timer" id="rec-timer">00:00</div>
+                        <div class="record-hint" id="rec-hint">點擊開始錄音</div>
+
+                        <div id="rec-preview"
+                            style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">
+                            <button class="btn btn-sm" onclick="playRecordingPreview(false)"
+                                style="background:rgba(16, 185, 129, 0.1); color:#10b981; border:1px solid rgba(16, 185, 129, 0.2); border-radius:100px; font-weight:800; font-size:11px;">
+                                <i class="ph-bold ph-play"></i> 預覽試聽
+                            </button>
+                            <button class="btn btn-sm" onclick="clearRecording(false)"
+                                style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); border-radius:100px; font-weight:800; font-size:11px; margin-left:8px;">
+                                <i class="ph-bold ph-trash"></i> 刪除重錄
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="detail-actions" id="detail-actions"></div>
+        </div>
+
+        <!-- ===== CREATE TASK ===== -->
+        <div class="screen hidden" id="screen-create" style="background: var(--bg);">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-home')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>發布委託</h1>
+                <div></div>
+            </div>
+
+            <div class="section-pad mt-2">
+                <!-- AI Generator UX Block -->
+                <div class="card"
+                    style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(74, 26, 138, 0.15)); border: 1px solid rgba(139, 92, 246, 0.4); padding: 12px 16px; margin-bottom: 20px; display:flex; align-items:center; gap: 12px;">
+                    <div style="font-size: 28px; animation: charFloat 3s ease-in-out infinite;">🤖</div>
+                    <div style="flex:1; text-align:left;">
+                        <div style="font-weight: 800; font-size: 14px; color: var(--primary);">沒靈感嗎？交給 AI 吧！</div>
+                    </div>
+                    <button class="btn btn-sm"
+                        style="background: linear-gradient(135deg, #8B5CF6, #E040FB); color: white; border-radius: 100px; font-weight: 900; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4); font-size: 13px; padding: 6px 16px;"
+                        onclick="aiGenerateTask()">
+                        <i class="ph-bold ph-magic-wand"></i> 生成
+                    </button>
+                </div>
+
+                <div
+                    style="font-size: 13px; font-weight: 900; color: var(--text2); margin-bottom: 12px; padding-left: 4px;">
+                    手建自訂委託</div>
+
+                <div class="card" style="padding: 16px;">
+                    <div class="form-group">
+                        <label>委託名稱</label>
+                        <input id="c-title" placeholder="例：整理書桌大冒險" style="font-size: 15px; font-weight: 700;">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>委託說明</label>
+                        <textarea id="c-desc" placeholder="描述委託內容…" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="card mt-3" style="padding: 16px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div class="form-group mb-0">
+                            <label>委託類型</label>
+                            <select id="c-type">
+                                <option value="CHORE">🧹 領地維護 (家務整理)</option>
+                                <option value="LEARNING">📚 奧術研習 (學術挑戰)</option>
+                                <option value="ADVENTURE">🌳 荒野考察 (戶外體育)</option>
+                                <option value="KINDNESS">💖 聖光差事 (善行委託)</option>
+                                <option value="CREATIVE">🎨 煉金工藝 (創意發想)</option>
+                                <option value="GAME">🎮 酒館博弈 (互動遊戲)</option>
+                                <option value="GOAL">🏆 傳奇宿命 (成就目標)</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label>難度設定</label>
+                            <select id="c-diff">
+                                <option value="EASY">⭐ 簡單 (30 XP)</option>
+                                <option value="MEDIUM" selected>⭐⭐ 普通 (50 XP)</option>
+                                <option value="HARD">⭐⭐⭐ 困難 (80 XP)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group mb-0"><label>截止時間</label><input type="datetime-local" id="c-deadline">
+                        </div>
+                        <div class="form-group mb-0"><label>地點</label><input id="c-location" placeholder="例：書房">
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3 mb-0">
+                        <label>冒險步驟（選填）</label>
+                        <div id="checklist-items" style="margin-bottom: 8px;"></div>
+                        <div class="flex gap-2">
+                            <input id="checklist-input" placeholder="新增步驟…" style="flex:1">
+                            <button class="btn btn-sm"
+                                style="background: rgba(255,255,255,0.1); border-radius: 8px; color: var(--text);"
+                                onclick="addChecklistItem()"><i class="ph-bold ph-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card mt-3" style="padding: 16px;">
+                    <div
+                        style="font-size: 13px; font-weight: 900; color: var(--text2); margin-bottom: 12px; padding-left: 4px;">
+                        🎁 神秘獎勵：錄製鼓勵音 (限10秒)</div>
+                    <div class="record-area"
+                        style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); margin-bottom: 0;">
+                        <div id="create-rec-status"
+                            style="font-size: 11px; font-weight: 800; color: var(--text3); margin-bottom: 12px;">
+                            準備好後點擊錄音</div>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:20px;">
+                            <button class="record-btn" id="create-record-btn" onclick="toggleTaskCreationRecording()"
+                                style="width:54px; height:54px; font-size:22px;">
+                                <i id="create-rec-icon" class="ph-fill ph-microphone"></i>
+                            </button>
+                            <div style="text-align:left;">
+                                <div class="record-timer" id="create-rec-timer"
+                                    style="font-family:monospace; font-size:18px; line-height:1; margin-bottom:4px;">
+                                    00:00</div>
+                                <div id="create-rec-hint" style="font-size:11px; font-weight:700; color:var(--text2);">
+                                    上限 10 秒</div>
+                            </div>
+                        </div>
+                        <div id="create-rec-preview"
+                            style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">
+                            <button class="btn btn-sm" onclick="playTaskCreationPreview()"
+                                style="background:rgba(16, 185, 129, 0.1); color:#10b981; border:1px solid rgba(16, 185, 129, 0.2); border-radius:100px; font-weight:800; font-size:11px;">
+                                <i class="ph-bold ph-play"></i> 預覽試聽
+                            </button>
+                            <button class="btn btn-sm" onclick="clearTaskCreationRecording()"
+                                style="background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.2); border-radius:100px; font-weight:800; font-size:11px; margin-left:8px;">
+                                <i class="ph-bold ph-trash"></i> 刪除重錄
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block mt-4"
+                    style="padding: 16px; font-size: 16px; border-radius: 16px; margin-bottom: 80px;"
+                    onclick="publishTask()">
+                    <i class="ph-bold ph-paper-plane-tilt"></i> 立即發布！
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== REWARDS ===== -->
+        <div class="screen hidden" id="screen-rewards">
+            <div class="topbar">
+                <h1>王國祕寶閣</h1>
+                <div></div>
+            </div>
+
+            <div style="padding: 16px 20px 0;">
+                <div
+                    style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 159, 67, 0.15)); border: 1px solid rgba(255, 215, 0, 0.4); border-radius: 20px; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 32px rgba(255,215,0,0.1); position:relative; overflow:hidden;">
+                    <div style="position:relative; z-index:1;">
+                        <div
+                            style="color:var(--text); font-size:14px; font-weight:800; margin-bottom:4px; opacity:0.9;">
+                            金幣存量
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <i class="ph-bold ph-coin" style="font-size:28px;"></i>
+                            <span id="shop-bal-hero"
+                                style="font-size:36px; font-weight:900; color:var(--primary); font-family:monospace; line-height:1; letter-spacing:1px;">0</span>
+                        </div>
+                    </div>
+                    <div
+                        style="position:absolute; right:-20px; top:-20px; font-size:100px; opacity:0.1; transform:rotate(15deg); pointer-events:none;">
+                        <i class="ph-fill ph-coin"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header" style="padding: 24px 16px 8px;">
+                <h2>👑 秘寶閣</h2>
+                <div></div>
+            </div>
+            <div id="rewards-featured" style="padding: 0 16px; margin-bottom:16px;"></div>
+
+            <div class="section-header"
+                style="padding: 12px 16px 12px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">🎁 尋寶市集</h2>
+                <div class="topbar-right">
+                    <button class="btn btn-sm"
+                        style="padding:6px 12px;font-size:12px;font-weight:900;background:rgba(255,159,67,0.15);color:var(--orange);border:1px solid rgba(255,159,67,0.3);border-radius:20px;cursor:pointer; display:flex; align-items:center; gap:4px;"
+                        onclick="showScreen('screen-custom-reward')">
+                        <i class="ph-bold ph-plus"></i> 新增
+                    </button>
+                </div>
+            </div>
+            <div id="rewards-list" style="padding: 0 16px; width: 100%; margin-bottom: 24px;">
+            </div>
+        </div>
+
+        <!-- ===== CUSTOM REWARD CREATION ==== -->
+        <div class="screen hidden" id="screen-custom-reward">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-rewards')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>新增自訂獎勵</h1>
+                <div></div>
+            </div>
+            <div class="section-pad">
+                <div class="card">
+                    <div class="form-group"><label>獎勵名稱</label><input id="rw-title" placeholder="例：去遊樂園"></div>
+                    <div class="form-group"><label>說明</label><input id="rw-desc" placeholder="例：週末全家去遊樂園"></div>
+                    <div class="flex gap-2">
+                        <div class="form-group" style="flex:1"><label>圖示</label><input id="rw-icon" placeholder="🎁">
+                        </div>
+                        <div class="form-group" style="flex:1"><label>點數</label><input id="rw-cost" type="number"
+                                placeholder="50"></div>
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="createCustomReward()">
+                        <i class="ph-bold ph-plus-circle"></i> 確認新增
+                    </button>
+                    <button class="btn btn-secondary btn-block mt-2" onclick="showScreen('screen-rewards')">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CHARACTER PROFILE ===== -->
+        <div class="screen hidden" id="screen-character">
+            <div class="topbar">
+                <h1>冒險者檔案</h1>
+                <div class="topbar-right">
+                    <button class="icon-btn" onclick="doLogout()" title="登出"><i
+                            class="ph-bold ph-sign-out"></i></button>
+                </div>
+            </div>
+            <div class="char-profile">
+                <div class="char-profile-avatar-container"
+                    onclick="document.getElementById('avatar-input-profile').click()">
+                    <div class="avatar-neon-glow"></div>
+                    <div class="avatar-neon-ring"></div>
+                    <div class="char-profile-avatar" id="prof-char-avatar">
+                        <span class="char-big" id="prof-char">🧙</span>
+                    </div>
+                    <!-- Single consolidated trigger: bottom-right camera overlay -->
+                    <div class="avatar-edit-badge">
+                        <i class="ph-fill ph-camera"></i>
+                    </div>
+                </div>
+
+                <div class="char-dialogue-bubble" id="prof-char-bubble"
+                    style="top:10px; left:50%; transform:translateX(-50%) translateY(10px) scale(0.95); max-width: 250px;">
+                </div>
+                <div class="char-title" id="prof-name">冒險者</div>
+                <div class="char-subtitle" id="prof-classname">見習冒險者</div>
+                <div class="char-class-badge" id="prof-class-badge">⭐ Lv.1 見習冒險者</div>
+            </div>
+            <div class="profile-stats">
+                <div class="p-stat"><span class="p-val" id="p-level">1</span><span class="p-label">等級</span></div>
+                <div class="p-stat"><span class="p-val" id="p-xp">0</span><span class="p-label">經驗</span></div>
+                <div class="p-stat" style="color: #FF6B00"><span class="p-val" id="p-atk"
+                        style="color: #FF6B00">15</span><span class="p-label" style="font-weight:900"><i
+                            class="ph-bold ph-sword"></i> 攻擊</span></div>
+                <div class="p-stat" style="color: #00E5FF"><span class="p-val" id="p-def"
+                        style="color: #00E5FF">5</span><span class="p-label" style="font-weight:900"><i
+                            class="ph-bold ph-shield"></i> 防禦</span></div>
+            </div>
+
+            <!-- Consolidated: Photo upload now handled by avatar overlay -->
+            <input type="file" id="avatar-input-profile" hidden accept="image/*"
+                onchange="handleAvatarUpload(event, true)">
+
+            <!-- ===== 1. MY GUILD (PROMOTED) ===== -->
+            <div style="padding:0 16px; margin-top:8px;">
+                <div class="profile-guild-card" id="profile-guild-card" onclick="openGuildDashboard()">
+                    <div class="profile-guild-icon" id="profile-guild-icon">🏰</div>
+                    <div class="profile-guild-info">
+                        <div class="profile-guild-name" id="profile-guild-name">加入公會</div>
+                        <div class="profile-guild-desc" id="profile-guild-desc">加入或建立你的公會，解鎖更多任務！</div>
+                    </div>
+                    <i class="ph-bold ph-caret-right" style="color:var(--text3);font-size:18px;"></i>
+                </div>
+            </div>
+
+            <!-- ===== 2. ACHIEVEMENTS (PROMOTED) ===== -->
+            <div class="section-header" style="margin-top:16px;">
+                <h2>🏆 成就牆</h2>
+                <div></div>
+            </div>
+            <div class="ach-grid" id="ach-grid"></div>
+
+            <!-- ===== 3. EQUIPMENT ===== -->
+            <div class="section-header" style="margin-top:8px">
+                <h2>裝備庫</h2>
+                <div></div>
+            </div>
+            <div class="ach-grid" id="equip-grid" style="margin-bottom:16px;">
+                <div style="text-align:center;color:var(--text3);font-size:12px;width:100%;grid-column:span 2">
+                    尚未裝備任何物品
+                </div>
+            </div>
+
+            <!-- ===== 4. ALL SETTINGS (UNIFIED MENU) ===== -->
+            <div class="menu-list">
+                <div class="menu-item" onclick="openAccountSettings()">
+                    <i class="ph-fill ph-user-gear" style="color:var(--primary)"></i> 冒險者檔案設定
+                    <span class="menu-right">設定 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="showScreen('screen-dashboard')">
+                    <i class="ph-fill ph-chart-bar" style="color:#F59E0B;"></i> 任務回顧
+                    <span class="menu-right">統計 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="showScreen('screen-subscription')">
+                    <i class="ph-fill ph-crown" style="color:#FFD700;"></i> 我的訂閱
+                    <span class="menu-right" id="menu-sub-label">免費版 <i class="ph ph-caret-right"></i></span>
+                </div>
+            </div>
+
+            <div class="section-pad">
+                <!-- Compact Redemption Code -->
+                <div
+                    style="display:flex; align-items:center; gap:8px; margin-top:16px; margin-bottom:24px; background:#ffffff; padding:10px 16px; border-radius:16px; border:1px solid var(--border); box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+                    <div style="font-size:18px;">🎁</div>
+                    <input type="text" id="redeem-code-input"
+                        style="flex:1; background:transparent; border:none; color:var(--text); font-size:15px; font-weight:700; outline:none; padding:4px 0;"
+                        placeholder="輸入兌換碼...">
+                    <button class="btn btn-primary"
+                        style="padding:8px 16px; font-size:13px; font-weight:800; min-height:auto; border-radius:10px;"
+                        onclick="processRedeemCode()">兌換</button>
+                </div>
+
+                <!-- Footer Links & App Info -->
+                <div style="text-align:center; padding:16px 0;">
+                    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:16px;">
+                        <a href="#"
+                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">會員使用條款</a>
+                        <span style="color:rgba(255,255,255,0.2)">|</span>
+                        <a href="#"
+                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">隱私政策</a>
+                        <span style="color:rgba(255,255,255,0.2)">|</span>
+                        <a href="#"
+                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">與我們聯繫</a>
+                    </div>
+                    <div style="color:var(--text3); font-size:11px;">ECHO 回聲 V1.01 (Build 20260228)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SUBSCRIPTION ===== -->
+        <div class="screen hidden" id="screen-subscription">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-character')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>訂閱方案</h1>
+                <div></div>
+            </div>
+            <div style="padding:16px 24px;">
+                <!-- Current Plan Badge -->
+                <div class="sub-card"
+                    style="background: linear-gradient(135deg, var(--surface), var(--bg)); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+                    <div class="sub-badge-big" id="sub-title-icon">🧭</div>
+                    <h3 id="sub-title" style="font-size:18px; font-weight:900;">初級冒險者</h3>
+                    <p class="text-muted text-sm" id="sub-desc" style="font-weight:700;">目前階級：平民冒險家</p>
+                </div>
+
+                <!-- Value Proposition -->
+                <div style="text-align:center; margin:20px 0 8px;">
+                    <div
+                        style="font-size:13px; font-weight:900; color:var(--primary); letter-spacing:2px; text-transform:uppercase;">
+                        ECHO PRO</div>
+                    <div style="font-size:22px; font-weight:900; color:var(--text); line-height:1.3; margin:8px 0;">
+                        晉升成為傳奇領主</div>
+                    <p style="font-size:13px; color:var(--text2); line-height:1.5;">極致的冒險體驗，為您與孩子的互動注入魔法</p>
+                </div>
+
+                <div class="paywall-price"><span class="price">$59</span><span class="period">/月</span></div>
+
+                <ul class="paywall-features">
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+                        <strong>無止境的任務派發</strong> —
+                        自由建立專屬挑戰，不限次數
+                    </li>
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i> <strong>心靈感應語音</strong>
+                        —
+                        用溫暖的語音回聲，給予最有力的支持</li>
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+                        <strong>全家族組隊模式</strong> —
+                        支援多人同時冒險，共享榮譽
+                    </li>
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+                        <strong>傳說級裝備解鎖</strong> —
+                        獲得獨家限定角色造型與動態外觀
+                    </li>
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+                        <strong>賢者之眼成長分析</strong> —
+                        深度追蹤冒險進度與能力值變化
+                    </li>
+                    <li><i class="ph-fill ph-check-circle" style="color:var(--primary)"></i>
+                        <strong>至尊級支援服務</strong> —
+                        享有最優先的問題解決與回饋處理
+                    </li>
+                </ul>
+
+                <button class="btn btn-primary btn-block" id="sub-action-btn" onclick="activateSubscription()"
+                    style="font-size:16px; padding:14px; border-radius:16px; font-weight:900;">
+                    👑 立即升級 PRO — $59/月
+                </button>
+                <p style="text-align:center; font-size:11px; color:var(--text3); margin-top:12px; line-height:1.5;">
+                    隨時可取消 · 7 天免費試用 · 安全付款
+                </p>
+                <button class="btn btn-secondary btn-block mt-2"
+                    onclick="showScreen('screen-character')">先繼續免費冒險</button>
+            </div>
+        </div>
+
+        <!-- ===== TASK DASHBOARD ===== -->
+        <div class="screen hidden" id="screen-dashboard">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-character')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>冒險回顧</h1>
+                <div></div>
+            </div>
+            <div style="padding:8px 16px">
+                <div class="dash-tabs" id="dash-tabs">
+                    <button class="dash-tab active" onclick="switchDashPeriod('week',this)">本週</button>
+                    <button class="dash-tab" onclick="switchDashPeriod('month',this)">本月</button>
+                    <button class="dash-tab" onclick="switchDashPeriod('year',this)">本年</button>
+                    <button class="dash-tab" onclick="switchDashPeriod('all',this)">全部</button>
+                </div>
+            </div>
+            <div style="padding:0 16px">
+                <div class="dash-summary" id="dash-summary"></div>
+
+                <div class="section-header" style="padding:16px 0 8px">
+                    <h2>✨ ECHO 冒險評語</h2>
+                    <div></div>
+                </div>
+                <div class="card" id="dash-ai-comment"
+                    style="border: 2px solid rgba(255,215,0,0.4); background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(139,92,246,0.08)); display:flex; gap:16px; align-items:flex-start;">
+                    <div style="font-size:36px; line-height:1; filter:drop-shadow(0 2px 8px rgba(255,107,0,0.3));">✨
+                    </div>
+                    <div style="font-size:14px; font-weight:800; color:var(--text); line-height:1.6; flex:1;"
+                        id="dash-ai-text">
+                        載入中…</div>
+                </div>
+                <div class="section-header" style="padding:12px 0 8px">
+                    <h2>委託類型分佈</h2>
+                    <div></div>
+                </div>
+                <div id="dash-type-grid"></div>
+                <div class="section-header" style="padding:12px 0 8px">
+                    <h2>達成成就</h2>
+                    <div></div>
+                </div>
+                <div id="dash-achievements"></div>
+            </div>
+        </div>
+
+        <!-- ===== BATTLE ARENA ===== -->
+        <div class="screen hidden" id="screen-battle">
+            <div class="topbar">
+                <button class="icon-btn" onclick="exitBattle()"><i class="ph-bold ph-arrow-left"></i></button>
+                <h1>⚔️ 冒險戰鬥</h1>
+                <div></div>
+            </div>
+            <div class="battle-arena">
+                <div class="battle-monster-area" id="monster-area">
+                    <div class="battle-monster-sprite" id="bm-sprite" style="position:relative">👹</div>
+                    <div class="battle-monster-info">
+                        <div class="battle-name" id="bm-name">怪物</div>
+                        <div class="battle-hp-bar">
+                            <div class="battle-hp-fill monster-hp" id="bm-hp" style="width:100%"></div>
+                        </div>
+                        <div class="battle-hp-text" id="bm-hp-text">HP: 100/100</div>
+                    </div>
+                </div>
+                <div class="battle-vs">⚔ VS</div>
+                <div class="battle-player-area" id="player-area">
+                    <div class="battle-player-sprite" id="bp-sprite" style="position:relative">⚔️</div>
+                    <div class="battle-player-info">
+                        <div class="battle-name" id="bp-name">冒險者</div>
+                        <div class="battle-hp-bar">
+                            <div class="battle-hp-fill player-hp" id="bp-hp" style="width:100%"></div>
+                        </div>
+                        <div class="battle-hp-text" id="bp-hp-text">HP: 100/100</div>
+                    </div>
+                </div>
+                <div class="battle-log" id="battle-log"></div>
+                <div class="battle-actions">
+                    <button class="btn btn-primary" id="btn-attack" onclick="battleAttack()">🗡 攻擊！</button>
+                    <button class="btn btn-magic" id="btn-skill" onclick="battleSkill()">⚡ 技能</button>
+                    <button class="btn btn-green" id="btn-heal" onclick="battleHeal()">♥ 治療</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LUCKY WHEEL SCREEN ===== -->
+        <div class="screen hidden" id="screen-wheel">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-home')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>🎡 幸運轉盤</h1>
+                <div></div>
+            </div>
+            <div class="wheel-container">
+                <p style="color:var(--text2);font-size:13px;font-weight:700;margin-bottom:16px">每天免費轉一次，贏取額外獎勵！</p>
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer">▼</div>
+                    <canvas id="wheel-canvas" width="280" height="280"></canvas>
+                </div>
+                <button class="btn btn-primary btn-block mt-4 wheel-spin-btn" id="wheel-spin-btn" onclick="spinWheel()">
+                    🎡 轉動轉盤！
+                </button>
+                <div id="wheel-result" style="margin-top:16px;font-size:16px;font-weight:900;color:var(--primary)">
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PAYWALL MODAL ===== -->
+        <div class="modal-overlay" id="daily-login-modal">
+            <div class="modal-sheet" style="padding: 24px;">
+                <div class="modal-title" style="font-size: 24px; text-align: center; margin-bottom: 8px;">📅 每日登入幸運禮
+                </div>
+                <div class="modal-desc" style="text-align: center; margin-bottom: 20px;">連續登入解鎖更多驚喜！目前連續：<span
+                        id="daily-streak-count" style="color:var(--primary); font-weight:900;">1</span> 天</div>
+
+                <div id="daily-rewards-grid"
+                    style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px;">
+                    <!-- Inserted by JS -->
+                </div>
+
+                <button class="btn btn-primary btn-block" id="btn-claim-daily"
+                    onclick="claimDailyReward()">領取今日獎勵！</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="paywall-modal">
+            <div class="modal-sheet">
+                <div class="modal-handle"></div>
+                <div class="modal-title">👑 解鎖無限冒險</div>
+                <div class="modal-desc">訂閱 Pro 版，享受無限任務發布、專屬角色進化、和更多獎勵！</div>
+                <div class="paywall-price"><span class="price">$59</span><span class="period">/月</span></div>
+                <ul class="paywall-features">
+                    <li><i class="ph-fill ph-check-circle"></i> 無限任務發布</li>
+                    <li><i class="ph-fill ph-check-circle"></i> 解鎖全部成就</li>
+                    <li><i class="ph-fill ph-check-circle"></i> 獨家角色外觀</li>
+                    <li><i class="ph-fill ph-check-circle"></i> 200 點數禮包</li>
+                </ul>
+                <button class="btn btn-primary btn-block" onclick="activateSubscription()">👑 訂閱 $59/月</button>
+                <button class="btn btn-secondary btn-block mt-2" onclick="closePaywall()">暫時不用</button>
+            </div>
+        </div>
+
+        <!-- ===== PURCHASE CONFIRM MODAL ===== -->
+        <div class="modal-overlay" id="purchase-modal"
+            style="display:none; align-items:center; justify-content:center; z-index:9000; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);">
+            <div class="modal-sheet" style="padding: 24px; text-align:center; max-width: 320px; width:90%;">
+                <div style="font-size:48px; margin-bottom:12px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));"
+                    id="pur-icon">🎁</div>
+                <div class="modal-title" id="pur-title"
+                    style="font-size:18px; font-weight:900; margin-bottom:8px; line-height:1.3;">確認兌換？</div>
+                <div class="modal-desc" id="pur-desc"
+                    style="margin-bottom:20px; color:var(--text2); font-size:13px; line-height:1.4;"></div>
+
+                <div
+                    style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:24px; padding: 12px; background: rgba(99,102,241,0.08); border-radius:16px;">
+                    <span style="font-size:13px; color:var(--text2); font-weight:800;">將消耗</span>
+                    <div
+                        style="font-weight:900; color:var(--primary); font-size:18px; font-family:monospace; display:flex; align-items:center; gap:4px;">
+                        <i class="ph-bold ph-coin" style="font-size:18px;"></i> <span id="pur-cost">0</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-secondary"
+                        style="flex:1; border-radius:14px; padding:12px 0; font-size:14px; font-weight:800; border:none; background:var(--surface); color:var(--text2);"
+                        onclick="closePurchaseModal()">再想想</button>
+                    <button class="btn" id="pur-confirm-btn"
+                        style="flex:1; border-radius:14px; padding:12px 0; background: linear-gradient(135deg, var(--primary), #a855f7); color:white; border:none; box-shadow: 0 4px 12px rgba(99,102,241,0.25); font-weight:900; font-size:14px;"
+                        onclick="confirmPurchase()">確認兌換</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== GUILD PROMPT MODAL ===== -->
+        <div class="modal-overlay" id="modal-guild-prompt"
+            style="display:none;align-items:center;justify-content:center;z-index:9000;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);">
+            <div class="modal-sheet" style="padding:28px 24px;text-align:center;max-width:340px;width:90%;">
+                <div style="font-size:56px;margin-bottom:12px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.1));">🏰
+                </div>
+                <div class="modal-title" style="font-size:18px;font-weight:900;margin-bottom:8px;">需要加入公會！</div>
+                <div class="modal-desc" style="margin-bottom:20px;color:var(--text2);font-size:13px;line-height:1.6;">
+                    冒險者，你還沒有專屬的冒險小隊！<br>請先加入或建立公會，才能領取隊長發布的專屬任務與獎勵喔！
+                </div>
+                <button class="btn btn-primary btn-block" style="margin-bottom:10px;" onclick="openGuildJoinScreen()">
+                    <i class="ph-bold ph-link"></i> 輸入邀請碼加入
+                </button>
+                <button class="btn btn-magic btn-block" onclick="openGuildCreateScreen()">
+                    <i class="ph-bold ph-plus-circle"></i> 創建新公會
+                </button>
+                <button class="btn btn-secondary btn-block" style="margin-top:10px;"
+                    onclick="closeGuildPrompt()">稍後再說</button>
+            </div>
+        </div>
+
+        <!-- ===== GUILD JOIN / CREATE SCREEN ===== -->
+        <div class="screen hidden" id="screen-guild-join">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-home')"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>🏰 加入公會</h1>
+                <div></div>
+            </div>
+            <div class="section-pad" style="padding:20px 16px;">
+                <!-- JOIN TAB -->
+                <div id="guild-join-section">
+                    <div class="card" style="text-align:center;padding:24px 16px;">
+                        <div style="font-size:48px;margin-bottom:8px;">🔗</div>
+                        <div style="font-weight:900;font-size:16px;margin-bottom:4px;">輸入邀請碼</div>
+                        <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">向你的隊長（家長）索取6位數邀請碼</div>
+                        <input id="guild-join-code" type="text" maxlength="6" placeholder="請輸入 6 位數邀請碼"
+                            style="text-align:center;font-size:24px;letter-spacing:8px;font-weight:900;font-family:monospace;">
+                        <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="doJoinGuild()">
+                            <i class="ph-bold ph-sign-in"></i> 加入公會
+                        </button>
+                    </div>
+                    <div style="text-align:center;margin:24px 0;color:var(--text3);font-weight:800;font-size:13px;">
+                        — 或
+                        —</div>
+                    <button class="btn btn-magic btn-block" onclick="openGuildCreateScreen()">
+                        <i class="ph-bold ph-plus-circle"></i> 建立新的公會
+                    </button>
+                </div>
+                <!-- CREATE TAB -->
+                <div id="guild-create-section" style="display:none;">
+                    <div class="card" style="padding:24px 16px;">
+                        <div style="text-align:center;font-size:48px;margin-bottom:8px;" id="guild-create-icon-preview">
+                            🏰</div>
+                        <div style="font-weight:900;font-size:16px;text-align:center;margin-bottom:16px;">建立你的冒險公會
+                        </div>
+                        <div class="form-group">
+                            <label>公會名稱</label>
+                            <input id="guild-create-name" placeholder="例：王家大冒險團" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>選擇公會圖示</label>
+                            <div class="guild-icon-grid" id="guild-icon-grid"></div>
+                        </div>
+                        <button class="btn btn-primary btn-block" style="margin-top:8px;" onclick="doCreateGuild()">
+                            <i class="ph-bold ph-flag-banner"></i> 建立公會！
+                        </button>
+                    </div>
+                    <button class="btn btn-secondary btn-block" style="margin-top:12px;"
+                        onclick="openGuildJoinScreen()">
+                        <i class="ph-bold ph-arrow-left"></i> 返回輸入邀請碼
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== GUILD DASHBOARD SCREEN ===== -->
+        <div class="screen hidden" id="screen-guild">
+            <div class="topbar">
+                <button class="icon-btn" onclick="showScreen('screen-character');refreshProfile()"><i
+                        class="ph-bold ph-arrow-left"></i></button>
+                <h1>🏰 我的公會</h1>
+                <div></div>
+            </div>
+            <div id="guild-dashboard-content" style="padding:16px;"></div>
+        </div>
+
+        <!-- ===== GUILD EDIT MODAL ===== -->
+        <div class="modal-overlay" id="modal-guild-edit"
+            style="display:none;align-items:center;justify-content:center;z-index:9000;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);">
+            <div class="modal-sheet" style="padding:24px;max-width:340px;width:90%;">
+                <div class="modal-title" style="font-size:16px;font-weight:900;margin-bottom:16px;text-align:center;"
+                    id="guild-edit-modal-title">編輯公會</div>
+                <div id="guild-edit-modal-body"></div>
+                <div style="display:flex;gap:12px;margin-top:16px;">
+                    <button class="btn btn-secondary" style="flex:1;" onclick="closeGuildEditModal()">取消</button>
+                    <button class="btn btn-primary" style="flex:1;" id="guild-edit-confirm-btn">確認</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TOAST + CELEBRATION ===== -->
+        <div class="toast" id="toast"><i class="ph-fill ph-star"></i><span id="toast-msg"></span></div>
+        <div class="celebration" id="celebration">
+            <div class="cel-icon" id="cel-icon">🎉</div>
+            <div class="cel-title" id="cel-title"></div>
+            <div class="cel-sub" id="cel-sub"></div>
+        </div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <nav class="bottomnav" id="main-nav" style="display:none">
+            <button class="nav-btn active" onclick="nav('screen-home',this)">
+                <i class="ph-fill ph-sword"></i><span>任務</span>
+            </button>
+            <button class="nav-btn" onclick="nav('screen-mytasks',this)">
+                <i class="ph-fill ph-scroll"></i><span>進度</span>
+            </button>
+            <button class="nav-btn" onclick="nav('screen-rewards',this)">
+                <i class="ph-fill ph-treasure-chest"></i><span>寶庫</span>
+            </button>
+            <button class="nav-btn" onclick="nav('screen-character',this); refreshProfile()">
+                <i class="ph-fill ph-shield-star"></i><span>冒險者</span>
+            </button>
+        </nav>
+
+        <!-- Version Tag -->
+        <div class="version-tag">V1.01</div>
+    </div>
+
+    <!-- Google API & Calendar Integration -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="js/gcal.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
