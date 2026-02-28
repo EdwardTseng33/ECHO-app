@@ -1,7 +1,9 @@
 {
   "name": "ECHO 回聲 | 親子冒險任務",
   "short_name": "ECHO 回聲",
-  "description": "用 RPG 冒險方式，讓孩子愛上完成任務！親子互動遊戲化任務平台。",
+  "description": "遊戲化親子互動任務平台！孩子化身冒險者，透過完成家庭委託獲得經驗值、金幣與裝備，培養責任感與自律能力。支援公會系統、魔塔戰鬥、幸運轉盤等豐富功能。",
+  "id": "/",
+  "dir": "ltr",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

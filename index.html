@@ -4,8 +4,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>ECHO 回聲 | 冒險者計畫</title>
-    <meta name="description" content="ECHO 回聲 — 用 RPG 冒險方式，讓冒險者愛上承接委託！遊戲化任務平台。">
+
+    <!-- SEO Core -->
+    <title>ECHO 回聲 — 親子 RPG 冒險任務平台 | 遊戲化家庭教育 App</title>
+    <meta name="description" content="ECHO 回聲是一款遊戲化親子互動任務平台。孩子化身冒險者，透過完成家庭委託獲得經驗值、金幣與裝備，培養責任感與自律能力。支援公會系統、每日戰鬥、幸運轉盤等豐富功能。">
+    <meta name="keywords" content="親子任務,遊戲化教育,兒童任務管理,RPG任務,家庭互動,兒童獎勵系統,ECHO回聲,親子App,gamification,family task,kids rewards">
+    <meta name="author" content="ECHO 回聲團隊">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://echo-app-ivory.vercel.app/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://echo-app-ivory.vercel.app/">
+    <meta property="og:title" content="ECHO 回聲 — 親子 RPG 冒險任務平台">
+    <meta property="og:description" content="讓孩子化身冒險者！透過完成家庭委託獲得經驗值與金幣，培養責任感與自律能力的遊戲化親子互動平台。">
+    <meta property="og:image" content="https://echo-app-ivory.vercel.app/img/og-cover.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="zh_TW">
+    <meta property="og:site_name" content="ECHO 回聲">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ECHO 回聲 — 親子 RPG 冒險任務平台">
+    <meta name="twitter:description" content="讓孩子化身冒險者！透過完成家庭委託獲得經驗值與金幣，培養責任感的遊戲化親子互動平台。">
+    <meta name="twitter:image" content="https://echo-app-ivory.vercel.app/img/og-cover.png">
+
+    <!-- JSON-LD Structured Data for AI / Search Engines -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "ECHO 回聲",
+        "alternateName": "ECHO",
+        "url": "https://echo-app-ivory.vercel.app/",
+        "description": "遊戲化親子互動任務平台。孩子化身冒險者，透過完成家庭委託獲得經驗值、金幣與裝備，培養責任感與自律能力。",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript",
+        "inLanguage": "zh-TW",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "TWD"
+        },
+        "audience": {
+            "@type": "EducationalAudience",
+            "educationalRole": "parent",
+            "audienceType": "families with children aged 5-15"
+        },
+        "featureList": [
+            "RPG 風格冒險任務系統",
+            "親子委託發布與接取",
+            "角色升級與職業進化",
+            "每日魔王戰鬥系統",
+            "幸運轉盤獎勵",
+            "公會系統",
+            "成就徽章收集",
+            "裝備與寶庫商城",
+            "任務完成度報表"
+        ],
+        "screenshot": "https://echo-app-ivory.vercel.app/img/og-cover.png"
+    }
+    </script>
+
+    <!-- PWA & Icons -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ECHO 回聲">
+    <link rel="apple-touch-icon" href="/img/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/icon-72x72.png">
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/bold/style.css">
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css">
@@ -27,6 +105,14 @@
 </head>
 
 <body>
+    <noscript>
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#F4F6FC;font-family:'Nunito',sans-serif;text-align:center;padding:40px;">
+            <div>
+                <h1 style="color:#6366F1;font-size:28px;">ECHO 回聲</h1>
+                <p style="color:#666;font-size:16px;margin-top:12px;">請啟用 JavaScript 以使用 ECHO 回聲冒險任務平台</p>
+            </div>
+        </div>
+    </noscript>
     <div id="app">
         <!-- ===== AUTH STEP 1: LOGIN PAGE ===== -->
         <div class="screen" id="screen-auth">
@@ -718,7 +804,7 @@
                         <a href="#"
                             style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">與我們聯繫</a>
                     </div>
-                    <div style="color:var(--text3); font-size:11px;">ECHO 回聲 V1.01 (Build 20260228)</div>
+                    <div style="color:var(--text3); font-size:11px;">ECHO 回聲 V1.02 (Build 20260228)</div>
                 </div>
             </div>
         </div>
@@ -1071,22 +1157,22 @@
 
         <!-- ===== BOTTOM NAV ===== -->
         <nav class="bottomnav" id="main-nav" style="display:none">
-            <button class="nav-btn active" onclick="nav('screen-home',this)">
+            <button class="nav-btn active" onclick="nav('screen-home',this)" aria-label="任務">
                 <i class="ph-fill ph-sword"></i><span>任務</span>
             </button>
-            <button class="nav-btn" onclick="nav('screen-mytasks',this)">
+            <button class="nav-btn" onclick="nav('screen-mytasks',this)" aria-label="進度">
                 <i class="ph-fill ph-scroll"></i><span>進度</span>
             </button>
-            <button class="nav-btn" onclick="nav('screen-rewards',this)">
+            <button class="nav-btn" onclick="nav('screen-rewards',this)" aria-label="寶庫">
                 <i class="ph-fill ph-treasure-chest"></i><span>寶庫</span>
             </button>
-            <button class="nav-btn" onclick="nav('screen-character',this); refreshProfile()">
+            <button class="nav-btn" onclick="nav('screen-character',this); refreshProfile()" aria-label="冒險者">
                 <i class="ph-fill ph-shield-star"></i><span>冒險者</span>
             </button>
         </nav>
 
         <!-- Version Tag -->
-        <div class="version-tag">V1.01</div>
+        <div class="version-tag">V1.02</div>
     </div>
 
     <!-- Google API & Calendar Integration -->

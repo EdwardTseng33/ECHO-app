@@ -1,5 +1,5 @@
 /* ==============================================
-   ECHO 回聲 V1.01 — Google Auth + Enhanced Battle + Lucky Wheel
+   ECHO 回聲 V1.02 — SEO Optimized + Bug Fixes + UI Polish
    + Publisher Names + Task Dashboard + AI Humor
    ============================================== */
 
@@ -522,6 +522,26 @@ function enterApp() {
             showCharacterQuote();
         }
     }, 6000); // 6 seconds
+
+    // Auto-create family guild for new users
+    const a = me();
+    if (a && (!a.guildId || !getMyGuild())) {
+        const guilds = getGuilds();
+        const guildId = 'G_default_' + myId();
+        if (!guilds[guildId]) {
+            guilds[guildId] = {
+                id: guildId,
+                name: a.name + '的冒險小隊',
+                icon: '🏰',
+                code: String(Math.floor(100000 + Math.random() * 900000)),
+                ownerId: myId(),
+                createdAt: Date.now(),
+                members: [{ id: myId(), name: a.name, emoji: '🧙', roleTitle: '隊長' }]
+            };
+        }
+        a.guildId = guildId;
+        saveGlobal();
+    }
 }
 
 function showCharacterQuote() {
@@ -592,7 +612,7 @@ function checkDailyLogin() {
                 <div style="font-size:24px; margin-bottom:4px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));">${r.icon}</div>
                 <div style="font-size:11px; font-weight:900; color:var(--text);">${r.label}</div>
                 ${r.day === 7 ? '<div style="position:absolute; top:-8px; right:-8px; background:#FF4757; color:#fff; font-size:9px; padding:2px 6px; border-radius:10px; font-weight:900;">大獎！</div>' : ''}
-            </div >
+            </div>
         `).join('');
     }
 
@@ -632,7 +652,7 @@ function showScreen(id) {
     if (id === 'screen-home') { refreshHUD(); renderTaskFeed(); refreshDailyBanner(); refreshWheelHint(); }
     if (id === 'screen-dashboard') { renderDashboard('week'); }
     if (id === 'screen-mytasks') renderMyTasks();
-    if (id === 'screen-rewards') { renderRewards(); document.getElementById('shop-bal').textContent = me().points || 0; }
+    if (id === 'screen-rewards') { renderRewards(); }
     if (id === 'screen-character') refreshProfile();
     if (id === 'screen-subscription') refreshSubPage();
     if (id === 'screen-create') resetCreateForm();
@@ -791,9 +811,9 @@ function refreshProfile() {
                         <div style="font-size:11px; color:var(--text2); display:flex; gap:6px;">
                             ${eq.atk ? `<span style="color:#FF6B00"><i class="ph-bold ph-sword"></i> +${eq.atk}</span>` : ''}
                             ${eq.def ? `<span style="color:#00E5FF"><i class="ph-bold ph-shield"></i> +${eq.def}</span>` : ''}
-                        </div >
-                    </div >
-                </div >
+                        </div>
+                    </div>
+                </div>
             `).join('');
         }
     }
@@ -895,7 +915,7 @@ function openAccountSettings() {
     const elGoogle = document.getElementById('acc-google-status');
     const elLoc = document.getElementById('acc-location');
     if (elName) elName.textContent = a.name || '冒險者';
-    if (elAge) elAge.textContent = a.age || '成員';
+    if (elAge) elAge.textContent = a.age || '—';
     if (elEmail) elEmail.textContent = a.email || 'user@echo.com';
     if (elGoogle) {
         if (a.googleBound) {
@@ -1364,7 +1384,7 @@ function renderAchievements() {
     });
 
     const finalHtml = `
-        < div class="ach-section" style = "margin-bottom: 16px;" >
+        <div class="ach-section" style="margin-bottom: 16px;">
             <div class="ach-section-header" onclick="toggleAchievementSection('ach-list-obtained', 'icon-obtained')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:8px 16px; background:var(--surface); border-radius:12px; margin-bottom:8px;">
                 <div style="font-size:14px; font-weight:900; color:var(--text);"><i class="ph-fill ph-medal"></i> 已獲得徽章 (${a.achievements.length})</div>
                 <i class="ph-bold ph-caret-down" id="icon-obtained" style="transition:transform 0.2s;"></i>
@@ -1374,7 +1394,7 @@ function renderAchievements() {
                     ${obtainedHtml || '<div style="grid-column:1/-1; color:var(--text3); font-size:13px; text-align:center; padding:12px;">尚未獲得徽章</div>'}
                 </div>
             </div>
-        </div >
+        </div>
 
         <div class="ach-section">
             <div class="ach-section-header" onclick="toggleAchievementSection('ach-list-locked', 'icon-locked')" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:8px 16px; background:var(--surface); border-radius:12px; margin-bottom:8px;">
@@ -1440,7 +1460,7 @@ function renderRewards() {
         const canAffordF = a.points >= featured.cost;
         const htmlF = echoBoxesHtml + `
         <div class="card" style="padding: 20px; display:flex; flex-direction:row; align-items:center; border: 1px solid ${canAffordF && featured.stock > 0 ? 'rgba(99, 102, 241, 0.3)' : 'rgba(0,0,0,0.06)'}; background: #ffffff; box-shadow: ${canAffordF && featured.stock > 0 ? '0 8px 24px rgba(99, 102, 241, 0.15)' : '0 4px 12px rgba(0,0,0,0.05)'}; position:relative; overflow:hidden;">
-            < !--Stock Badge-- >
+            <!--Stock Badge-->
             <div style="position:absolute; top:12px; right:12px; background:${featured.stock > 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color:${featured.stock > 0 ? '#10b981' : '#ef4444'}; font-size:11px; font-weight:900; padding:4px 10px; border-radius:10px; border:1px solid ${featured.stock > 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};">
                 庫存: ${featured.stock}
             </div>
@@ -1453,24 +1473,24 @@ function renderRewards() {
                     <div style="font-weight:900; color:var(--primary); font-size:18px; font-family:monospace; background:rgba(99, 102, 241, 0.08); padding:4px 12px; border-radius:20px; display:flex; align-items:center; gap:4px;"><i class="ph-bold ph-coin"></i> ${featured.cost}</div>
                     <button class="btn ${canAffordF && featured.stock > 0 ? 'btn-magic' : 'btn-secondary'}" style="padding:6px 16px; font-size:14px; border-radius:12px; font-weight:800;" onclick="redeemReward('${featured.sku}')" ${(!canAffordF || featured.stock <= 0) ? 'disabled style="opacity:.5"' : ''}>${featured.stock <= 0 ? '已售罄' : canAffordF ? '兌換！' : '金幣不足'}</button>
                 </div>
-            </div >
-        </div > `;
+            </div>
+        </div>`;
         document.getElementById('rewards-featured').innerHTML = htmlF;
     }
 
     // Render Regular List (2-Column Equal Size Layout)
-    document.getElementById('rewards-list').innerHTML = `< div style = "display:grid; grid-template-columns:repeat(2, 1fr); grid-auto-rows:1fr; gap:16px; width:100%;" > ` + regular.map(r => {
+    document.getElementById('rewards-list').innerHTML = `<div style="display:grid; grid-template-columns:repeat(2, 1fr); grid-auto-rows:1fr; gap:16px; width:100%;">` + regular.map(r => {
         const canAfford = a.points >= r.cost && r.stock > 0;
         const outOfStock = r.stock <= 0;
         return `
         <div class="card" style="margin:0 !important; padding:16px; display:flex; flex-direction:column; justify-content:space-between; background:#ffffff; border:1px solid ${canAfford ? 'var(--border)' : 'rgba(0,0,0,0.06)'}; border-radius:20px; ${(!canAfford || outOfStock) ? 'opacity:0.6; filter:grayscale(0.5);' : 'box-shadow:0 8px 24px rgba(0,0,0,0.04); cursor:pointer;'}" ${canAfford ? `onclick="redeemReward('${r.sku}')"` : ''}>
-        
-        < !--Stock count-- >
+
+        <!--Stock count-->
         <div style="font-size:10px; font-weight:900; color:${outOfStock ? 'var(--red)' : 'var(--text3)'}; text-align:right; margin-bottom:4px;">
             ${outOfStock ? '已售罄' : `庫存: ${r.stock}`}
         </div>
 
-        <!--Top content: icon + text-- >
+        <!--Top content: icon + text-->
         <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px;">
             <div style="width:56px; height:56px; border-radius:50%; background:${canAfford ? 'radial-gradient(circle at top left, rgba(99,102,241,0.15), rgba(99,102,241,0.05))' : 'rgba(0,0,0,0.04)'}; display:flex; justify-content:center; align-items:center; border:1px solid ${canAfford ? 'rgba(99,102,241,0.1)' : 'transparent'};">
                 <span style="font-size:32px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));">${r.icon}</span>
@@ -1479,7 +1499,7 @@ function renderRewards() {
             <p style="font-size:12px; color:var(--text2); line-height:1.4; margin:0; height:34px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${esc(r.desc)}</p>
         </div>
 
-        <!--Footer -->
+        <!--Footer-->
         <div style="padding-top:12px; border-top:1px dashed rgba(0,0,0,0.08); display:flex; justify-content:space-between; align-items:center; width:100%; margin-top:12px;">
             <div style="font-weight:900; color:${canAfford ? 'var(--primary)' : 'var(--text3)'}; font-size:15px; font-family:monospace; display:flex; align-items:center; gap:4px;">
                 <i class="ph-bold ph-coin" style="font-size:16px;"></i> ${r.cost}
@@ -1488,9 +1508,9 @@ function renderRewards() {
                 ${outOfStock ? '售罄' : canAfford ? '兌換' : '<i class="ph-bold ph-lock"></i>'}
             </button>
         </div>
-    </div >
+    </div>
         `;
-    }).join('') + `</div > `;
+    }).join('') + `</div>`;
 }
 
 let pendingPurchaseSku = null;
@@ -1575,7 +1595,7 @@ function createCustomReward() {
     const cost = parseInt(document.getElementById('rw-cost').value) || 0;
     if (!title) { showToast('請輸入獎勵名稱'); return; }
     if (cost < 1) { showToast('金幣至少為 1'); return; }
-    globalData.rewards.push({ sku: 'C' + Date.now(), title: icon + ' ' + title, desc, icon, cost, custom: true });
+    globalData.rewards.push({ sku: 'C' + Date.now(), title: icon + ' ' + title, desc, icon, cost, stock: 99, custom: true });
     saveGlobal();
     document.getElementById('rw-title').value = ''; document.getElementById('rw-desc').value = '';
     document.getElementById('rw-icon').value = ''; document.getElementById('rw-cost').value = '';
@@ -1744,7 +1764,7 @@ function showCelebration(icon, title, sub) { document.getElementById('cel-icon')
 function spawnConfetti() {
     const cel = document.getElementById('celebration'); const co = ['#FFD700', '#FF6B00', '#7C5CFC', '#39FF14', '#FF3860', '#00E5FF', '#FF6EB4', '#B0A0D0']; for (let i = 0; i < 50; i++) { const p = document.createElement('div'); p.style.cssText = `position: absolute; width:${3 + Math.random() * 7}px; height:${3 + Math.random() * 7}px; background:${co[i % co.length]}; border-radius:${Math.random() > .5 ? '50%' : '2px'}; left:${Math.random() * 100}%; top:${-5 + Math.random() * 25}%; animation:cFall ${1.2 + Math.random() * 2}s ease-out forwards; opacity: .9; pointer-events: none;`; cel.appendChild(p); setTimeout(() => p.remove(), 4000); }
 }
-const csty = document.createElement('style'); csty.textContent = `@keyframes cFall{ 0 % { transform: translateY(0) rotate(0);opacity: 1 }100 % { transform: translateY(${window.innerHeight}px) rotate(720deg);opacity: 0 } } `; document.head.appendChild(csty);
+const csty = document.createElement('style'); csty.textContent = `@keyframes cFall{ 0% { transform: translateY(0) rotate(0);opacity: 1 }100% { transform: translateY(${window.innerHeight}px) rotate(720deg);opacity: 0 } } `; document.head.appendChild(csty);
 
 function gid() { return 'T' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -1792,7 +1812,7 @@ function startDailyBattle() {
     // Initialize or clamp HP
     if (a.currentHp === undefined || a.currentHp <= 0) {
         if (a.currentHp <= 0) {
-            showToast('血量不足！請升級或前往商城購買藥水恢復 HP。');
+            showToast('⚠️ 血量歸零了！請前往寶庫購買治療藥水恢復 HP');
             return;
         }
         a.currentHp = pMaxHp;

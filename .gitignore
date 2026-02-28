@@ -1,10 +1,12 @@
 # Backup & temp files
 *.backup
 *_backup_*
+*_old*
 tmp/
 diff.txt
 diff-utf8.txt
 app_fixed.js
+app_fixed*.js
 
 # OS files
 .DS_Store
