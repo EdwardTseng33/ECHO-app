@@ -1,5 +1,5 @@
 /* ==============================================
-   ECHO 回聲 V1.02 — SEO Optimized + Bug Fixes + UI Polish
+   ECHO 回聲 V1.03 — Full Feature Fix + Auth + Guild + Sound
    + Publisher Names + Task Dashboard + AI Humor
    ============================================== */
 
@@ -7,7 +7,7 @@
 const XP_TABLE = { EASY: 30, MEDIUM: 50, HARD: 80 };
 const PTS_RATIO = 0.2;
 const LEVEL_CAP = 50;
-const FREE_TASK_LIMIT = 1;
+const FREE_TASK_LIMIT = 999;
 const TYPE_LABELS = {
     CHORE: '🧹 領地維護 (家務整理)', LEARNING: '📚 奧術研習 (學術挑戰)',
     ADVENTURE: '🌳 荒野考察 (戶外體育)', KINDNESS: '💖 聖光差事 (善行委託)', CREATIVE: '🎨 煉金工藝 (創意發想)',
@@ -171,6 +171,15 @@ const SoundManager = {
             gain.gain.setValueAtTime(0.2, now);
             gain.gain.linearRampToValueAtTime(0, now + 0.6);
             osc.start(now); osc.stop(now + 0.6);
+        } else if (type === 'levelUp') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.setValueAtTime(500, now + 0.15);
+            osc.frequency.setValueAtTime(600, now + 0.3);
+            osc.frequency.setValueAtTime(800, now + 0.45);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.8);
+            osc.start(now); osc.stop(now + 0.8);
         }
     }
 };
@@ -198,7 +207,7 @@ function defaultAccount(name) {
         achievements: [], redemptions: [], activeSub: null,
         battlesWon: 0, lastBattleDate: null, potions: 0,
         consecutiveLogins: 0, lastDailyClaim: null,
-        equipment: [], avatarUrl: null
+        equipment: [], avatarUrl: null, tasksPublished: 0
     };
 }
 function loadGlobal() {
@@ -206,6 +215,17 @@ function loadGlobal() {
     return defaultGlobal();
 }
 function saveGlobal() { localStorage.setItem('echo3', JSON.stringify(globalData)); }
+
+// Simple password hash (POC level - not production crypto)
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0;
+    }
+    return 'h_' + Math.abs(hash).toString(36);
+}
 
 // Active account helper
 function me() { return globalData.accounts[globalData.activeId] || null; }
@@ -287,7 +307,11 @@ function doLoginStep1() {
     }
 
     if (accId) {
-        // Existing user — log in directly
+        // Existing user — validate password
+        const acc = globalData.accounts[accId];
+        if (acc.p_hash && acc.p_hash !== '***' && acc.p_hash !== simpleHash(password)) {
+            showToast('❌ 密碼錯誤，請重新輸入！'); return;
+        }
         globalData.activeId = accId;
         saveGlobal();
         if (!me().avatarUrl) {
@@ -302,6 +326,7 @@ function doLoginStep1() {
         accId = 'U' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
         globalData.accounts[accId] = defaultAccount('冒險者');
         globalData.accounts[accId].email = email;
+        globalData.accounts[accId].p_hash = simpleHash(password);
         globalData.activeId = accId;
         saveGlobal();
         showScreen('screen-auth-step2');
@@ -349,9 +374,7 @@ function cleanLocation(loc) {
 function doLogin() { doLoginStep1(); }
 
 function doGoogleLogin() {
-    // Simulated Google login for POC
-    showToast('✅ Google 登入成功！');
-    loginAs('小明');
+    showToast('🔧 Google 登入功能開發中，敬請期待！');
 }
 
 function loginAs(name) {
@@ -503,6 +526,14 @@ function getClassColor(level) {
     let cls = CLASS_PATH[0];
     for (const c of CLASS_PATH) { if (level >= c.lvl) cls = c; }
     return cls.color;
+}
+
+function getCharTier(level) {
+    let tier = 0;
+    for (let i = 0; i < CLASS_PATH.length; i++) {
+        if (level >= CLASS_PATH[i].lvl) tier = i;
+    }
+    return tier;
 }
 
 // ===== ENTER APP =====
@@ -666,6 +697,8 @@ function nav(id, btn) {
 
 // ===== REFRESH =====
 function refreshAll() { refreshHUD(); renderTaskFeed(); checkAchievements(); }
+
+function refreshHome() { refreshHUD(); renderTaskFeed(); }
 
 function refreshHUD() {
     const a = me(); if (!a) return;
@@ -880,31 +913,6 @@ function refreshProfile() {
     renderAchievements();
 }
 
-function editUsername() {
-    const a = me();
-    if (!a) return;
-    const newName = prompt('請輸入新的冒險者名稱：', a.name);
-    if (newName && newName.trim().length > 0) {
-        a.name = newName.trim().substring(0, 15);
-        saveGlobal();
-        refreshProfile();
-        refreshHome(); // update dashboard header if needed
-        showToast('名稱修改成功！');
-    }
-}
-
-function editAge() {
-    const a = me();
-    if (!a) return;
-    const newAge = prompt('🎂 請輸入冒險者的年齡：', a.age || 10);
-    if (newAge && !isNaN(parseInt(newAge)) && parseInt(newAge) > 0) {
-        a.age = parseInt(newAge);
-        saveGlobal();
-        refreshProfile();
-        showToast('年齡已成功更新為「' + a.age + '」歲！');
-    }
-}
-
 function openAccountSettings() {
     showScreen('screen-account');
     const a = me(); if (!a) return;
@@ -991,8 +999,8 @@ function changePasswordFlow() {
         showToast('⚠️ 警告：兩次輸入的新密碼不相符！');
         return;
     }
-    // POC: Store password stub
-    a.p_hash = '***'; // Simulated
+    // Store hashed password
+    a.p_hash = simpleHash(newPass);
     saveGlobal();
     showCelebration('🔒', '密碼更新成功', '您的契約現在更安全了！');
 }
@@ -2085,20 +2093,6 @@ function hurtFlash(id) {
 // ===== UTILS =====
 // getCharImg consolidated above
 
-function esc(s) {
-    if (!s) return '';
-    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-    return s.replace(/[&<>"']/g, m => map[m]);
-}
-
-function showToast(msg) {
-    const b = document.createElement('div');
-    b.className = 'toast show';
-    b.innerHTML = msg;
-    document.body.appendChild(b);
-    setTimeout(() => { b.classList.remove('show'); setTimeout(() => b.remove(), 300); }, 3000);
-}
-
 
 // BACKGROUND REMOVAL logic is now handled in handleAvatarUpload
 
@@ -2547,21 +2541,8 @@ function doJoinGuild() {
     let isNew = false;
 
     if (!found) {
-        const guildId = 'G' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-        found = {
-            id: guildId,
-            name: '測試冒險團 #' + codeValue,
-            icon: '🛡️',
-            code: codeValue,
-            ownerId: 'mock-parent',
-            createdAt: Date.now(),
-            members: [
-                { id: 'mock-parent', name: '家長助手', emoji: '🧑‍💼', roleTitle: '會長' },
-                { id: myId(), name: a.name, emoji: getCharEmojiForGuild(a), roleTitle: '成員' }
-            ]
-        };
-        guilds[guildId] = found;
-        isNew = true;
+        showToast('❌ 找不到此邀請碼對應的公會，請確認後重試！');
+        return;
     } else {
         if (found.members.some(m => m.id === myId())) {
             showToast('你已經是這個公會的成員了！');

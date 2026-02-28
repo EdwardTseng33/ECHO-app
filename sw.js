@@ -3,7 +3,7 @@
 // Cache-first for static assets, network-first for API
 // ============================================
 
-const CACHE_NAME = 'echo-v1.02-cache';
+const CACHE_NAME = 'echo-v1.03-cache';
 const OFFLINE_URL = '/';
 
 const PRECACHE_ASSETS = [
