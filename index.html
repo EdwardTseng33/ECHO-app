@@ -682,32 +682,24 @@
             <div class="char-profile">
                 <div class="char-profile-avatar-container"
                     onclick="document.getElementById('avatar-input-profile').click()">
-                    <div class="avatar-neon-glow"></div>
-                    <div class="avatar-neon-ring"></div>
                     <div class="char-profile-avatar" id="prof-char-avatar">
                         <span class="char-big" id="prof-char">🧙</span>
                     </div>
-                    <!-- Single consolidated trigger: bottom-right camera overlay -->
                     <div class="avatar-edit-badge">
                         <i class="ph-fill ph-camera"></i>
                     </div>
                 </div>
-
-                <div class="char-dialogue-bubble" id="prof-char-bubble"
-                    style="top:10px; left:50%; transform:translateX(-50%) translateY(10px) scale(0.95); max-width: 250px;">
-                </div>
+                <div class="char-dialogue-bubble" id="prof-char-bubble"></div>
                 <div class="char-title" id="prof-name">冒險者</div>
-                <div class="char-subtitle" id="prof-classname">見習冒險者</div>
+                <span class="char-subtitle" id="prof-classname" hidden>見習冒險者</span>
                 <div class="char-class-badge" id="prof-class-badge">⭐ Lv.1 見習冒險者</div>
             </div>
             <div class="profile-stats">
                 <div class="p-stat"><span class="p-val" id="p-level">1</span><span class="p-label">等級</span></div>
                 <div class="p-stat"><span class="p-val" id="p-xp">0</span><span class="p-label">經驗</span></div>
-                <div class="p-stat" style="color: #FF6B00"><span class="p-val" id="p-atk"
-                        style="color: #FF6B00">15</span><span class="p-label" style="font-weight:900"><i
+                <div class="p-stat p-stat-atk"><span class="p-val" id="p-atk">15</span><span class="p-label"><i
                             class="ph-bold ph-sword"></i> 攻擊</span></div>
-                <div class="p-stat" style="color: #00E5FF"><span class="p-val" id="p-def"
-                        style="color: #00E5FF">5</span><span class="p-label" style="font-weight:900"><i
+                <div class="p-stat p-stat-def"><span class="p-val" id="p-def">5</span><span class="p-label"><i
                             class="ph-bold ph-shield"></i> 防禦</span></div>
             </div>
 
@@ -716,77 +708,67 @@
                 onchange="handleAvatarUpload(event, true)">
 
             <!-- ===== 1. MY GUILD (PROMOTED) ===== -->
-            <div style="padding:0 16px; margin-top:8px;">
+            <div class="section-pad" style="padding-top:12px; padding-bottom:0;">
                 <div class="profile-guild-card" id="profile-guild-card" onclick="openGuildDashboard()">
                     <div class="profile-guild-icon" id="profile-guild-icon">🏰</div>
                     <div class="profile-guild-info">
                         <div class="profile-guild-name" id="profile-guild-name">加入公會</div>
                         <div class="profile-guild-desc" id="profile-guild-desc">加入或建立你的公會，解鎖更多任務！</div>
                     </div>
-                    <i class="ph-bold ph-caret-right" style="color:var(--text3);font-size:18px;"></i>
+                    <i class="ph-bold ph-caret-right profile-guild-arrow"></i>
                 </div>
             </div>
 
             <!-- ===== 2. ACHIEVEMENTS (PROMOTED) ===== -->
-            <div class="section-header" style="margin-top:16px;">
+            <div class="section-header">
                 <h2>🏆 成就牆</h2>
                 <div></div>
             </div>
             <div class="ach-grid" id="ach-grid"></div>
 
             <!-- ===== 3. EQUIPMENT ===== -->
-            <div class="section-header" style="margin-top:8px">
+            <div class="section-header">
                 <h2>裝備庫</h2>
                 <div></div>
             </div>
-            <div class="ach-grid" id="equip-grid" style="margin-bottom:16px;">
-                <div style="text-align:center;color:var(--text3);font-size:12px;width:100%;grid-column:span 2">
-                    尚未裝備任何物品
-                </div>
+            <div class="ach-grid" id="equip-grid">
+                <div class="equip-empty-msg">尚未裝備任何物品</div>
             </div>
 
             <!-- ===== 4. ALL SETTINGS (UNIFIED MENU) ===== -->
             <div class="menu-list">
                 <div class="menu-item" onclick="openAccountSettings()">
-                    <i class="ph-fill ph-user-gear" style="color:var(--primary)"></i> 冒險者檔案設定
+                    <i class="ph-fill ph-user-gear menu-icon-primary"></i> 冒險者檔案設定
                     <span class="menu-right">設定 <i class="ph ph-caret-right"></i></span>
                 </div>
                 <div class="menu-item" onclick="showScreen('screen-dashboard')">
-                    <i class="ph-fill ph-chart-bar" style="color:#F59E0B;"></i> 任務回顧
+                    <i class="ph-fill ph-chart-bar menu-icon-amber"></i> 任務回顧
                     <span class="menu-right">統計 <i class="ph ph-caret-right"></i></span>
                 </div>
                 <div class="menu-item" onclick="showScreen('screen-subscription')">
-                    <i class="ph-fill ph-crown" style="color:#FFD700;"></i> 我的訂閱
+                    <i class="ph-fill ph-crown menu-icon-gold"></i> 我的訂閱
                     <span class="menu-right" id="menu-sub-label">免費版 <i class="ph ph-caret-right"></i></span>
                 </div>
             </div>
 
             <div class="section-pad">
                 <!-- Compact Redemption Code -->
-                <div
-                    style="display:flex; align-items:center; gap:8px; margin-top:16px; margin-bottom:24px; background:#ffffff; padding:10px 16px; border-radius:16px; border:1px solid var(--border); box-shadow:0 4px 16px rgba(0,0,0,0.04);">
-                    <div style="font-size:18px;">🎁</div>
-                    <input type="text" id="redeem-code-input"
-                        style="flex:1; background:transparent; border:none; color:var(--text); font-size:15px; font-weight:700; outline:none; padding:4px 0;"
-                        placeholder="輸入兌換碼...">
-                    <button class="btn btn-primary"
-                        style="padding:8px 16px; font-size:13px; font-weight:800; min-height:auto; border-radius:10px;"
-                        onclick="processRedeemCode()">兌換</button>
+                <div class="redeem-row">
+                    <div class="redeem-icon">🎁</div>
+                    <input type="text" id="redeem-code-input" class="redeem-input" placeholder="輸入兌換碼...">
+                    <button class="btn btn-primary redeem-btn" onclick="processRedeemCode()">兌換</button>
                 </div>
 
                 <!-- Footer Links & App Info -->
-                <div style="text-align:center; padding:16px 0;">
-                    <div style="display:flex; justify-content:center; gap:16px; margin-bottom:16px;">
-                        <a href="#"
-                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">會員使用條款</a>
-                        <span style="color:rgba(255,255,255,0.2)">|</span>
-                        <a href="#"
-                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">隱私政策</a>
-                        <span style="color:rgba(255,255,255,0.2)">|</span>
-                        <a href="#"
-                            style="color:var(--text2); font-size:12px; font-weight:700; text-decoration:none;">與我們聯繫</a>
+                <div class="app-footer">
+                    <div class="app-footer-links">
+                        <a href="#">會員使用條款</a>
+                        <span class="app-footer-sep">|</span>
+                        <a href="#">隱私政策</a>
+                        <span class="app-footer-sep">|</span>
+                        <a href="#">與我們聯繫</a>
                     </div>
-                    <div style="color:var(--text3); font-size:11px;">ECHO 回聲 V1.03 (Build 20260301)</div>
+                    <div class="app-footer-version">ECHO 回聲 V1.03 (Build 20260301)</div>
                 </div>
             </div>
         </div>
