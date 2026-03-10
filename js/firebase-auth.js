@@ -14,11 +14,11 @@ const EchoAuth = {
      * 初始化 Auth 監聽器
      * 返回 Promise：首次 auth state 確認後 resolve
      */
-    init() {
+    async init() {
         if (!firebaseAuth) {
             console.warn('[EchoAuth] Firebase Auth not available, falling back to local mode');
             this._authChecked = true;
-            return Promise.resolve(null);
+            return null;
         }
 
         // 處理 Google Redirect 回調（手機 PWA 場景）
