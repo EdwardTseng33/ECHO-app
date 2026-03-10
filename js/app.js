@@ -1,5 +1,6 @@
 /* ==============================================
-   ECHO 回聲 V1.05 — Streak System + Daily Quests
+   ECHO 回聲 V1.06 — 角色身份統一重構
+   + Streak System + Daily Quests
    + Firebase Auth + Firestore + Stripe Payment
    + Full Feature Fix + Auth + Guild + Sound
    + Publisher Names + Task Dashboard + AI Humor
@@ -28,16 +29,16 @@ const ADVENTURE_QUOTES = [
     "完成委託，解鎖更多驚喜！"
 ];
 
-// 3 major class tiers (simplified from 7)
-// 7 major class tiers for progression
+// V1.06: Unified identity — tier suffix + charPreset name
+// e.g. 選了「戰士」→ 戰士見習 → 青銅戰士 → 白銀戰士 → 黃金戰士 → ...
 const CLASS_PATH = [
-    { lvl: 1, tier: 1, suffix: '見習', color: '#B0A0D0', name: '冒險見習生' },
-    { lvl: 5, tier: 2, suffix: '青銅', color: '#CD7F32', name: '青銅冒險者' },
-    { lvl: 12, tier: 3, suffix: '白銀', color: '#C0C0C0', name: '白銀開拓者' },
-    { lvl: 20, tier: 4, suffix: '黃金', color: '#FFD700', name: '黃金守望者' },
-    { lvl: 30, tier: 5, suffix: '傳奇', color: '#00E5FF', name: '傳奇英雄' },
-    { lvl: 40, tier: 6, suffix: '聖域', color: '#F472B6', name: '聖域守護者' },
-    { lvl: 50, tier: 7, suffix: '永恆', color: '#FFFFFF', name: '永恆王者' },
+    { lvl: 1, tier: 1, suffix: '見習', color: '#B0A0D0' },
+    { lvl: 5, tier: 2, suffix: '青銅', color: '#CD7F32' },
+    { lvl: 12, tier: 3, suffix: '白銀', color: '#C0C0C0' },
+    { lvl: 20, tier: 4, suffix: '黃金', color: '#FFD700' },
+    { lvl: 30, tier: 5, suffix: '傳奇', color: '#00E5FF' },
+    { lvl: 40, tier: 6, suffix: '聖域', color: '#F472B6' },
+    { lvl: 50, tier: 7, suffix: '永恆', color: '#FFFFFF' },
 ];
 
 const DEFAULT_REWARDS = [
@@ -65,7 +66,7 @@ const ACHIEVEMENTS = [
     { id: 'rich', icon: '<i class="ph-bold ph-coin"></i>', name: '大富翁', desc: '累積獲得500金幣', check: s => s.points >= 500 },
     { id: 'lvl5', icon: '⭐', name: '漸入佳境', desc: '達到等級5', check: s => s.level >= 5 },
     { id: 'lvl10', icon: '🌟', name: '爐火純青', desc: '達到等級10', check: s => s.level >= 10 },
-    { id: 'lvl20', icon: '🏆', name: '傳奇英雄', desc: '達到滿級Lv.20', check: s => s.level >= 20 },
+    { id: 'lvl20', icon: '🏆', name: '黃金傳說', desc: '達到 Lv.20，晉升黃金段位', check: s => s.level >= 20 },
     { id: 'first_blood', icon: '🩸', name: '第一滴血', desc: '第一次達成委託', check: s => s.completedCount >= 1 },
     { id: 'shopaholic', icon: '🛍️', name: '購物狂', desc: '兌換過3次獎勵', check: s => (s.redemptions || []).length >= 3 },
     // V1.05: Streak achievements
@@ -211,7 +212,7 @@ function defaultGlobal() {
 }
 function defaultAccount(name) {
     return {
-        name, role: 'Adventurer', character: 'Adventurer',
+        name, charPreset: 'mage',
         points: 0, level: 1, totalXP: 0, completedCount: 0,
         achievements: [], redemptions: [], activeSub: null,
         battlesWon: 0, lastBattleDate: null, potions: 0,
@@ -410,7 +411,8 @@ function completeRegistration() {
     }
 
     saveGlobal();
-    showCelebration('📸', `歡迎冒險者 ${name}！`, '冒險即將開始…');
+    const className = getClassName(a.level, a);
+    showCelebration('📸', `歡迎 ${className} ${name}！`, '冒險即將開始…');
     setTimeout(() => enterApp(), 2500);
 }
 
@@ -551,7 +553,7 @@ function openCharPresetPicker() {
     overlay.id = 'char-preset-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
     overlay.innerHTML = `<div style="background:var(--bg);border-radius:24px;padding:24px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;">
-        <div style="font-size:16px;font-weight:900;color:var(--text);margin-bottom:12px;">🎭 更換冒險角色</div>
+        <div style="font-size:16px;font-weight:900;color:var(--text);margin-bottom:12px;">🎭 轉職 — 選擇你的職業</div>
         ${html}
         <button onclick="document.getElementById('char-preset-overlay').remove()" style="margin-top:12px;width:100%;padding:12px;border-radius:12px;background:var(--surface);color:var(--text2);font-weight:800;border:none;cursor:pointer;">取消</button>
     </div>`;
@@ -569,7 +571,8 @@ function applyCharPreset(id) {
     refreshHUD();
     const overlay = document.getElementById('char-preset-overlay');
     if (overlay) overlay.remove();
-    showToast('✨ 角色已更換為「' + preset.name + '」！');
+    const fullTitle = getClassName(a.level, a);
+    showToast(`✨ 角色已轉職為「${fullTitle}」！`);
 }
 
 async function blobToBase64(blob) {
@@ -680,10 +683,16 @@ function getCharImg(charDef, size = 48, level = 1, isAnimated = true) {
     const animClass = isAnimated ? 'avatar-animated' : '';
     return `<img src="${src}" class="${animClass}" style="width:${size}px;height:${size}px;object-fit:contain; border-radius:50%">`;
 }
-function getClassName(level, char) {
+function getClassName(level, account) {
     let cls = CLASS_PATH[0];
     for (const c of CLASS_PATH) { if (level >= c.lvl) cls = c; }
-    return cls.name;
+    // V1.06: Combine tier suffix + character preset name
+    const a = typeof account === 'string' ? globalData.accounts[account] : account;
+    const presetId = (a && a.charPreset) ? a.charPreset : 'mage';
+    const preset = CHAR_PRESETS.find(c => c.id === presetId);
+    const charName = preset ? preset.name : '冒險者';
+    // Tier 1 = "法師見習", Tier 2 = "青銅法師", etc.
+    return cls.tier === 1 ? `${charName}見習` : `${cls.suffix}${charName}`;
 }
 function getClassColor(level) {
     let cls = CLASS_PATH[0];
@@ -872,7 +881,6 @@ function refreshHome() { refreshHUD(); renderTaskFeed(); }
 
 function refreshHUD() {
     const a = me(); if (!a) return;
-    const c = a.character;
     const stats = getPlayerStats(a);
 
     const elIcon = document.getElementById('hud-char-icon');
@@ -964,7 +972,7 @@ function refreshProfile() {
     if (glowEl) glowEl.style.background = `conic-gradient(from var(--angle), ${ringColor}, #a855f7, #ec4899, ${ringColor})`;
 
     document.getElementById('prof-name').textContent = a.name;
-    const cn = getClassName(a.level);
+    const cn = getClassName(a.level, a);
     document.getElementById('prof-classname').textContent = cn;
     document.getElementById('prof-class-badge').innerHTML = `⭐ Lv.${a.level} ${cn}`;
     document.getElementById('prof-class-badge').style.color = ringColor;
@@ -1655,12 +1663,16 @@ function toggleAchievementSection(contentId, iconId) {
 
 function renderClassPath() {
     const a = me(); if (!a) return;
+    const presetId = (a && a.charPreset) ? a.charPreset : 'mage';
+    const preset = CHAR_PRESETS.find(c => c.id === presetId);
+    const charName = preset ? preset.name : '冒險者';
     document.getElementById('class-path').innerHTML = CLASS_PATH.map((tier, i) => {
         const reached = a.level >= tier.lvl;
+        const tierTitle = tier.tier === 1 ? `${charName}見習` : `${tier.suffix}${charName}`;
         return `<div class="card flex items-center gap-2" style="${reached ? 'border-color:' + tier.color : 'opacity:.4'}">
       <span style="font-size:36px;filter:${reached ? 'none' : 'grayscale(1)'}">${reached ? '🏆' : '🔒'}</span>
       <div>
-        <div style="font-weight:900;color:${reached ? tier.color : 'var(--text3)'}">${tier.name}</div>
+        <div style="font-weight:900;color:${reached ? tier.color : 'var(--text3)'}">${tierTitle}</div>
         <div class="text-xs text-muted">Lv.${tier.lvl} ${i === 0 ? '起始' : '進化'}</div>
       </div>
       <span style="margin-left:auto;font-size:18px">${reached ? '✅' : '🔒'}</span>
@@ -2293,8 +2305,8 @@ function battleWin() {
     saveGlobal(); checkAchievements();
 
     bs.log.push(`<span class="log-win">🎉 擊敗了第 ${bs.layer} 層魔王！獲得 + ${xpGain} XP · +${ptsGain} 金幣！</span>`);
-    const oldClass = getClassName(oldLvl);
-    const newClass = getClassName(a.level);
+    const oldClass = getClassName(oldLvl, a);
+    const newClass = getClassName(a.level, a);
     if (newClass !== oldClass) {
         saveGlobal();
         showCelebration('🎊', '職業晉升！', `你現在是 ${newClass}！`);
