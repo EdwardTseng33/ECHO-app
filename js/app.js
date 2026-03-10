@@ -2146,10 +2146,12 @@ function refreshDailyBanner() {
     const a = me(); if (!a) return;
     const layer = (a.battlesWon || 0) + 1;
     const m = getCurrentBoss(layer);
-    document.getElementById('daily-monster-name').textContent = `第 ${layer} 層 - ${m.name}`;
-    document.getElementById('daily-monster-emoji').textContent = m.emoji;
-    document.getElementById('daily-battle-hint').textContent = `強力魔王等著你！`;
-    document.getElementById('battle-banner').style.opacity = '1';
+    const elName = document.getElementById('daily-monster-name');
+    const elEmoji = document.getElementById('daily-monster-emoji');
+    const elHint = document.getElementById('daily-battle-hint');
+    if (elName) elName.textContent = `第 ${layer} 層 - ${m.name}`;
+    if (elEmoji) elEmoji.textContent = m.emoji;
+    if (elHint) elHint.textContent = `強力魔王等著你！`;
 }
 
 function startDailyBattle() {
