@@ -1278,18 +1278,85 @@ function statusLabel(s) {
     return { PUBLISHED: '開放委託', CLAIMED: '冒險中', COMPLETED_PENDING_CONFIRM: '待確認', COMPLETED_CONFIRMED: '冒險達成' }[s] || s;
 }
 
-// ===== MY TASKS =====
+// ===== MY TASKS / PROGRESS =====
+let _progressTab = 'active';
+
+function switchProgressTab(tab) {
+    _progressTab = tab;
+    document.getElementById('ptab-active').classList.toggle('active', tab === 'active');
+    document.getElementById('ptab-done').classList.toggle('active', tab === 'done');
+    document.getElementById('mytasks-active').classList.toggle('hidden', tab !== 'active');
+    document.getElementById('mytasks-done').classList.toggle('hidden', tab !== 'done');
+}
+
 function renderMyTasks() {
     const uid = myId();
+    const a = me();
     const active = globalData.tasks.filter(t => t.claimedBy === uid && t.status !== 'COMPLETED_CONFIRMED');
     const done = globalData.tasks.filter(t => t.claimedBy === uid && t.status === 'COMPLETED_CONFIRMED');
 
+    // --- Summary Card ---
+    const summaryEl = document.getElementById('progress-summary');
+    if (summaryEl && a) {
+        const xpCur = xpForLevel(a.level);
+        const xpNxt = xpForLevel(a.level + 1);
+        const xpInLevel = a.totalXP - xpCur;
+        const xpNeeded = xpNxt - xpCur;
+        const pct = xpNeeded > 0 ? Math.min(Math.round((xpInLevel / xpNeeded) * 100), 100) : 100;
+
+        summaryEl.innerHTML = `
+          <div class="progress-summary-card">
+            <div class="progress-summary-stats">
+              <div class="progress-stat">
+                <div class="progress-stat-value">${a.level || 1}</div>
+                <div class="progress-stat-label">等級</div>
+              </div>
+              <div class="progress-stat">
+                <div class="progress-stat-value">${a.completedCount || 0}</div>
+                <div class="progress-stat-label">已完成</div>
+              </div>
+              <div class="progress-stat">
+                <div class="progress-stat-value">${a.streakCount || 0}<span style="font-size:16px;">🔥</span></div>
+                <div class="progress-stat-label">連續天數</div>
+              </div>
+            </div>
+            <div class="progress-xp-bar"><div class="progress-xp-fill" style="width:${pct}%"></div></div>
+            <div class="progress-xp-text">
+              <span>Lv.${a.level} → Lv.${a.level + 1}</span>
+              <span>${xpInLevel} / ${xpNeeded} XP</span>
+            </div>
+          </div>`;
+    }
+
+    // --- Tab Counts ---
+    const cActive = document.getElementById('ptab-active-count');
+    const cDone = document.getElementById('ptab-done-count');
+    if (cActive) cActive.textContent = active.length;
+    if (cDone) cDone.textContent = done.length;
+
+    // --- Active Tasks ---
     document.getElementById('mytasks-active').innerHTML = active.length
         ? active.map(t => taskCardHTML(t)).join('')
-        : '<div class="text-center text-muted" style="padding:24px"><p>沒有進行中的冒險</p></div>';
+        : `<div class="progress-empty">
+             <div class="progress-empty-icon">🗺️</div>
+             <div class="progress-empty-title">尚無進行中的冒險</div>
+             <div class="progress-empty-desc">前往任務大廳接取委託，展開你的冒險之旅吧！</div>
+             <button class="progress-empty-btn" onclick="showScreen('screen-tasks')">
+               <i class="ph-bold ph-compass"></i> 探索任務
+             </button>
+           </div>`;
+
+    // --- Done Tasks ---
     document.getElementById('mytasks-done').innerHTML = done.length
         ? done.map(t => taskCardHTML(t)).join('')
-        : '<div class="text-center text-muted" style="padding:24px"><p>還沒達成過冒險！</p></div>';
+        : `<div class="progress-empty">
+             <div class="progress-empty-icon">🏆</div>
+             <div class="progress-empty-title">還沒有完成的冒險</div>
+             <div class="progress-empty-desc">完成第一個委託就能獲得經驗值和金幣，解鎖成就勳章！</div>
+           </div>`;
+
+    // Restore tab state
+    switchProgressTab(_progressTab);
 }
 
 // ===== TASK DETAIL =====

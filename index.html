@@ -439,22 +439,31 @@
             <div class="section-pad" id="task-feed"></div>
         </div>
 
-        <!-- ===== MY TASKS ===== -->
+        <!-- ===== MY TASKS / PROGRESS ===== -->
         <div class="screen hidden" id="screen-mytasks">
             <div class="topbar">
-                <h1>冒險者勳章</h1>
+                <h1><i class="ph-bold ph-scroll"></i> 冒險進度</h1>
                 <div></div>
             </div>
-            <div class="section-header">
-                <h2>進行中</h2>
-                <div></div>
+
+            <!-- Progress Summary Card -->
+            <div class="section-pad" id="progress-summary"></div>
+
+            <!-- Tab Toggle: 進行中 / 已完成 -->
+            <div class="progress-tabs">
+                <button class="progress-tab active" id="ptab-active" onclick="switchProgressTab('active')">
+                    <i class="ph-bold ph-sword"></i> 進行中 <span class="progress-tab-count" id="ptab-active-count">0</span>
+                </button>
+                <button class="progress-tab" id="ptab-done" onclick="switchProgressTab('done')">
+                    <i class="ph-bold ph-trophy"></i> 已完成 <span class="progress-tab-count" id="ptab-done-count">0</span>
+                </button>
             </div>
+
+            <!-- Active Tasks -->
             <div class="section-pad" id="mytasks-active"></div>
-            <div class="section-header">
-                <h2>已完成</h2>
-                <div></div>
-            </div>
-            <div class="section-pad" id="mytasks-done"></div>
+
+            <!-- Done Tasks (hidden by default) -->
+            <div class="section-pad hidden" id="mytasks-done"></div>
         </div>
 
         <!-- ===== TASK DETAIL ===== -->
