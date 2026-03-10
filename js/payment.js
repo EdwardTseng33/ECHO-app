@@ -1,0 +1,218 @@
+/**
+ * ECHO Payment Module
+ * ====================
+ * 🌸 蘇菲的金庫管理 — Stripe 金流串接
+ *
+ * 架構：
+ * 1. 使用 Stripe Checkout（託管付款頁面）
+ * 2. 使用者點擊「升級 PRO」→ 建立 Checkout Session → 跳轉 Stripe
+ * 3. 付款成功 → 回調頁面 → 更新訂閱狀態
+ *
+ * ⚠️ 生產環境需要：
+ * - Stripe Secret Key 放在 Cloud Function / 後端
+ * - Webhook 驗證付款成功事件
+ * - 本 POC 版本使用 Stripe 測試模式
+ */
+
+const EchoPayment = {
+    // ⚠️ 替換為你的 Stripe Publishable Key（測試模式用 pk_test_ 開頭）
+    STRIPE_PK: 'pk_test_REPLACE_WITH_YOUR_KEY',
+
+    // 定價方案
+    PLANS: {
+        pro_monthly: {
+            name: 'ECHO PRO 月訂閱',
+            price: 59, // NTD
+            currency: 'twd',
+            interval: 'month',
+            // ⚠️ 替換為你在 Stripe Dashboard 建立的 Price ID
+            stripePriceId: 'price_REPLACE_WITH_YOUR_PRICE_ID',
+            features: [
+                '無限任務派發',
+                '語音回聲錄音',
+                '全家族組隊模式',
+                '傳說級裝備解鎖',
+                '賢者之眼成長分析',
+                '至尊級支援服務'
+            ]
+        }
+    },
+
+    stripe: null,
+
+    /**
+     * 初始化 Stripe
+     */
+    init() {
+        if (typeof Stripe !== 'undefined' && !this.STRIPE_PK.includes('REPLACE')) {
+            this.stripe = Stripe(this.STRIPE_PK);
+            console.log('[EchoPayment] ✅ Stripe 初始化成功');
+        } else {
+            console.warn('[EchoPayment] Stripe 未設定或 SDK 未載入，使用 Demo 模式');
+        }
+    },
+
+    /**
+     * 開始訂閱付款流程
+     */
+    async startCheckout(planId = 'pro_monthly') {
+        const plan = this.PLANS[planId];
+        if (!plan) {
+            showToast('方案不存在');
+            return;
+        }
+
+        const uid = EchoAuth.getUid();
+        if (!uid) {
+            showToast('請先登入！');
+            return;
+        }
+
+        // 如果 Stripe 已設定 → 走真實流程
+        if (this.stripe && !plan.stripePriceId.includes('REPLACE')) {
+            await this._stripeCheckout(plan, uid);
+        } else {
+            // Demo 模式 → 模擬付款彈窗
+            this._demoCheckout(plan, uid);
+        }
+    },
+
+    /**
+     * Stripe Checkout 真實流程
+     * ⚠️ 需要後端 API 建立 Checkout Session
+     */
+    async _stripeCheckout(plan, uid) {
+        showToast('⏳ 正在準備付款頁面...');
+
+        try {
+            // 呼叫你的後端 API 建立 Checkout Session
+            // ⚠️ 替換為你的 Cloud Function / 後端 API 網址
+            const response = await fetch('https://YOUR_BACKEND_URL/api/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    priceId: plan.stripePriceId,
+                    userId: uid,
+                    userEmail: EchoAuth.currentUser?.email || '',
+                    successUrl: window.location.origin + '/?payment=success',
+                    cancelUrl: window.location.origin + '/?payment=cancel'
+                })
+            });
+
+            const session = await response.json();
+
+            if (session.id) {
+                // 跳轉到 Stripe Checkout 頁面
+                const result = await this.stripe.redirectToCheckout({
+                    sessionId: session.id
+                });
+                if (result.error) {
+                    showToast('付款跳轉失敗：' + result.error.message);
+                }
+            } else {
+                showToast('建立付款頁面失敗，請稍後再試');
+            }
+        } catch (err) {
+            console.error('[EchoPayment] Checkout 失敗:', err);
+            showToast('付款服務暫時無法使用，請稍後再試');
+        }
+    },
+
+    /**
+     * Demo 模式：模擬付款確認彈窗
+     * 用於 POC 展示，展示完整流程但不實際扣款
+     */
+    _demoCheckout(plan, uid) {
+        const modal = document.createElement('div');
+        modal.id = 'payment-demo-modal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);';
+        modal.innerHTML = `
+            <div style="background:var(--bg,#fff);border-radius:24px;padding:32px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                <div style="font-size:48px;margin-bottom:16px;">💳</div>
+                <h3 style="font-size:20px;font-weight:900;color:var(--text,#1a1a2e);margin-bottom:8px;">確認訂閱</h3>
+                <p style="font-size:14px;color:var(--text2,#666);margin-bottom:24px;line-height:1.6;">
+                    你即將訂閱 <strong>${plan.name}</strong><br>
+                    每月 <strong style="color:#6366F1;font-size:18px;">NT$ ${plan.price}</strong>
+                </p>
+
+                <div style="background:var(--surface,#f5f5f5);border-radius:16px;padding:16px;margin-bottom:24px;text-align:left;">
+                    <div style="font-size:12px;font-weight:800;color:var(--text2,#666);margin-bottom:8px;">包含以下特權：</div>
+                    ${plan.features.map(f => `<div style="font-size:13px;color:var(--text,#333);padding:4px 0;"><span style="color:#6366F1;margin-right:6px;">✦</span>${f}</div>`).join('')}
+                </div>
+
+                <div style="background:rgba(255,193,7,0.1);border:1px solid rgba(255,193,7,0.3);border-radius:12px;padding:10px;margin-bottom:20px;">
+                    <div style="font-size:11px;color:#F59E0B;font-weight:800;">🔧 POC 展示模式</div>
+                    <div style="font-size:11px;color:var(--text3,#999);">此為模擬付款，不會產生實際扣款</div>
+                </div>
+
+                <button onclick="EchoPayment._confirmDemoPayment('${uid}')"
+                    style="width:100%;padding:14px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;font-size:16px;font-weight:900;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.3);">
+                    👑 確認訂閱 — NT$ ${plan.price}/月
+                </button>
+                <button onclick="document.getElementById('payment-demo-modal').remove()"
+                    style="width:100%;padding:12px;background:transparent;color:var(--text2,#666);font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:8px;">
+                    先繼續免費冒險
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    },
+
+    /**
+     * Demo 付款確認
+     */
+    async _confirmDemoPayment(uid) {
+        document.getElementById('payment-demo-modal')?.remove();
+
+        const a = globalData.accounts[uid];
+        if (!a) return;
+
+        a.subscription = 'pro';
+        a.subscriptionStart = Date.now();
+        a.subscriptionEnd = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 天
+        a.points += 200; // PRO 禮包
+
+        saveGlobal();
+
+        // 同步到 Firestore
+        if (typeof EchoDb !== 'undefined' && EchoDb.isReady()) {
+            await EchoDb.saveSubscription(uid, {
+                plan: 'pro',
+                startDate: a.subscriptionStart,
+                endDate: a.subscriptionEnd
+            });
+        }
+
+        closePaywall();
+        showCelebration('👑', '歡迎加入 PRO！', '獲得 200 回聲金幣禮包 + 全部特權解鎖');
+        setTimeout(() => {
+            refreshAll();
+            refreshSubPage();
+        }, 2600);
+    },
+
+    /**
+     * 檢查 URL 參數處理付款回調
+     */
+    handlePaymentCallback() {
+        const params = new URLSearchParams(window.location.search);
+        const paymentStatus = params.get('payment');
+
+        if (paymentStatus === 'success') {
+            // 付款成功 → 更新狀態
+            const a = me();
+            if (a) {
+                a.subscription = 'pro';
+                a.subscriptionStart = Date.now();
+                a.points += 200;
+                saveGlobal();
+                showCelebration('👑', '付款成功！', '歡迎加入 ECHO PRO，所有特權已解鎖！');
+            }
+            // 清除 URL 參數
+            window.history.replaceState({}, '', window.location.pathname);
+        } else if (paymentStatus === 'cancel') {
+            showToast('付款已取消，你可以隨時再試');
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }
+};

@@ -78,7 +78,7 @@ const GCalManager = {
                 'timeZone': 'Asia/Taipei'
             },
             'end': {
-                'dateTime': task.deadline ? new Date(t.deadline).toISOString() : new Date(task.createdAt + 3600000).toISOString(),
+                'dateTime': task.deadline ? new Date(task.deadline).toISOString() : new Date(task.createdAt + 3600000).toISOString(),
                 'timeZone': 'Asia/Taipei'
             }
         };
