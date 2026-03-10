@@ -97,8 +97,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/" defer></script>
+    <!-- PAYUNi 金流（正式版再引入） -->
 
     <link rel="stylesheet" href="css/styles.css">
     <style>
@@ -894,10 +893,10 @@
 
                 <button class="btn btn-primary btn-block" id="sub-action-btn" onclick="EchoPayment.startCheckout('pro_monthly')"
                     style="font-size:16px; padding:14px; border-radius:16px; font-weight:900;">
-                    👑 立即升級 PRO — $59/月
+                    👑 立即升級 PRO — NT$59 / 30天
                 </button>
                 <p style="text-align:center; font-size:11px; color:var(--text3); margin-top:12px; line-height:1.5;">
-                    隨時可取消 · 7 天免費試用 · Stripe 安全付款
+                    30 天通行證 · 到期前提醒續購 · 安全付款
                 </p>
                 <button class="btn btn-secondary btn-block mt-2"
                     onclick="showScreen('screen-character')">先繼續免費冒險</button>
@@ -1211,7 +1210,7 @@
         </nav>
 
         <!-- Version Tag -->
-        <div class="version-tag">V1.06</div>
+        <div class="version-tag">V1.07</div>
     </div>
 
     <!-- Firebase Modules (must load before app.js) -->

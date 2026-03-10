@@ -1,32 +1,38 @@
 /**
- * ECHO Payment Module
- * ====================
- * 🌸 蘇菲的金庫管理 — Stripe 金流串接
+ * ECHO Payment Module — POC Edition
+ * ===================================
+ * 🌸 蘇菲的金庫管理 — PAYUNi 金流預備
  *
  * 架構：
- * 1. 使用 Stripe Checkout（託管付款頁面）
- * 2. 使用者點擊「升級 PRO」→ 建立 Checkout Session → 跳轉 Stripe
- * 3. 付款成功 → 回調頁面 → 更新訂閱狀態
+ * 1. POC 階段使用 Demo 模式（模擬付款，不實際扣款）
+ * 2. 正式版將串接 PAYUNi UPP 整合式支付頁
+ * 3. 使用者點擊「升級 PRO」→ Demo 確認彈窗 → 解鎖 PRO
  *
- * ⚠️ 生產環境需要：
- * - Stripe Secret Key 放在 Cloud Function / 後端
- * - Webhook 驗證付款成功事件
- * - 本 POC 版本使用 Stripe 測試模式
+ * 正式版 TODO：
+ * - PAYUNi MerchantID / MerKey / MerIV 設定於 Cloud Function
+ * - AES 加密交易參數 → 呼叫 PAYUNi UPP API
+ * - ReturnURL / NotifyURL 處理付款回調
+ * - 信用卡 / 超商代碼 / ATM 轉帳支援
  */
 
 const EchoPayment = {
-    // ⚠️ 替換為你的 Stripe Publishable Key（測試模式用 pk_test_ 開頭）
-    STRIPE_PK: 'pk_test_REPLACE_WITH_YOUR_KEY',
+
+    // === PAYUNi 設定（正式版填入） ===
+    PAYUNI_CONFIG: {
+        merchantId: 'REPLACE_WITH_MERCHANT_ID',
+        // ⚠️ MerKey / MerIV 不可放前端！僅供 Cloud Function 使用
+        apiUrl: 'https://api.payuni.com.tw/api/upp',        // 正式環境
+        sandboxUrl: 'https://sandbox-api.payuni.com.tw/api/upp', // 測試環境
+        useSandbox: true,
+    },
 
     // 定價方案
     PLANS: {
         pro_monthly: {
-            name: 'ECHO PRO 月訂閱',
+            name: 'ECHO PRO 30天通行證',
             price: 59, // NTD
-            currency: 'twd',
-            interval: 'month',
-            // ⚠️ 替換為你在 Stripe Dashboard 建立的 Price ID
-            stripePriceId: 'price_REPLACE_WITH_YOUR_PRICE_ID',
+            currency: 'TWD',
+            duration: 30, // 天
             features: [
                 '無限任務派發',
                 '語音回聲錄音',
@@ -38,89 +44,93 @@ const EchoPayment = {
         }
     },
 
-    stripe: null,
+    isReady: false,
 
     /**
-     * 初始化 Stripe
+     * 初始化付款模組
      */
     init() {
-        if (typeof Stripe !== 'undefined' && !this.STRIPE_PK.includes('REPLACE')) {
-            this.stripe = Stripe(this.STRIPE_PK);
-            console.log('[EchoPayment] ✅ Stripe 初始化成功');
+        const cfg = this.PAYUNI_CONFIG;
+        if (!cfg.merchantId.includes('REPLACE')) {
+            this.isReady = true;
+            console.log('[EchoPayment] ✅ PAYUNi 設定就緒（' + (cfg.useSandbox ? '沙箱' : '正式') + '模式）');
         } else {
-            console.warn('[EchoPayment] Stripe 未設定或 SDK 未載入，使用 Demo 模式');
+            console.warn('[EchoPayment] PAYUNi 未設定，使用 Demo 模式');
         }
     },
 
     /**
-     * 開始訂閱付款流程
+     * 開始付款流程
      */
     async startCheckout(planId = 'pro_monthly') {
         const plan = this.PLANS[planId];
-        if (!plan) {
-            showToast('方案不存在');
+        if (!plan) { showToast('方案不存在'); return; }
+
+        const uid = (typeof EchoAuth !== 'undefined' && EchoAuth.getUid) ? EchoAuth.getUid() : null;
+        if (!uid) { showToast('請先登入！'); return; }
+
+        // 檢查是否已是 PRO
+        const a = globalData.accounts[uid];
+        if (a && a.subscription === 'pro' && a.subscriptionEnd > Date.now()) {
+            showToast('你已經是 PRO 會員！');
             return;
         }
 
-        const uid = EchoAuth.getUid();
-        if (!uid) {
-            showToast('請先登入！');
-            return;
-        }
-
-        // 如果 Stripe 已設定 → 走真實流程
-        if (this.stripe && !plan.stripePriceId.includes('REPLACE')) {
-            await this._stripeCheckout(plan, uid);
+        if (this.isReady) {
+            // 正式版：呼叫後端 Cloud Function → 取得 PAYUNi UPP 表單資料 → 跳轉
+            await this._payuniCheckout(plan, uid);
         } else {
-            // Demo 模式 → 模擬付款彈窗
+            // POC Demo 模式
             this._demoCheckout(plan, uid);
         }
     },
 
     /**
-     * Stripe Checkout 真實流程
-     * ⚠️ 需要後端 API 建立 Checkout Session
+     * PAYUNi UPP 正式流程（待實作）
+     * 流程：前端 → Cloud Function 加密 → PAYUNi UPP 託管頁面 → 回調
      */
-    async _stripeCheckout(plan, uid) {
+    async _payuniCheckout(plan, uid) {
         showToast('⏳ 正在準備付款頁面...');
 
         try {
-            // 呼叫你的後端 API 建立 Checkout Session
-            // ⚠️ 替換為你的 Cloud Function / 後端 API 網址
-            const response = await fetch('https://YOUR_BACKEND_URL/api/create-checkout-session', {
+            // 呼叫後端 Cloud Function 建立交易
+            // Cloud Function 負責 AES 加密（MerKey + MerIV）
+            const response = await fetch('/api/create-payuni-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    priceId: plan.stripePriceId,
+                    planId: 'pro_monthly',
                     userId: uid,
-                    userEmail: EchoAuth.currentUser?.email || '',
-                    successUrl: window.location.origin + '/?payment=success',
-                    cancelUrl: window.location.origin + '/?payment=cancel'
+                    amount: plan.price,
+                    productName: plan.name,
+                    returnUrl: window.location.origin + '/?payment=success',
+                    notifyUrl: window.location.origin + '/api/payuni-notify',
                 })
             });
 
-            const session = await response.json();
+            const data = await response.json();
 
-            if (session.id) {
-                // 跳轉到 Stripe Checkout 頁面
-                const result = await this.stripe.redirectToCheckout({
-                    sessionId: session.id
-                });
-                if (result.error) {
-                    showToast('付款跳轉失敗：' + result.error.message);
-                }
+            if (data.formHtml) {
+                // PAYUNi UPP：後端回傳自動提交表單 HTML → 注入頁面跳轉
+                const container = document.createElement('div');
+                container.innerHTML = data.formHtml;
+                document.body.appendChild(container);
+                container.querySelector('form')?.submit();
+            } else if (data.paymentUrl) {
+                // 或直接跳轉
+                window.location.href = data.paymentUrl;
             } else {
-                showToast('建立付款頁面失敗，請稍後再試');
+                showToast('建立付款失敗，請稍後再試');
             }
         } catch (err) {
-            console.error('[EchoPayment] Checkout 失敗:', err);
-            showToast('付款服務暫時無法使用，請稍後再試');
+            console.error('[EchoPayment] PAYUNi 結帳失敗:', err);
+            showToast('付款服務暫時無法使用');
         }
     },
 
     /**
      * Demo 模式：模擬付款確認彈窗
-     * 用於 POC 展示，展示完整流程但不實際扣款
+     * POC 展示用，不實際扣款
      */
     _demoCheckout(plan, uid) {
         const modal = document.createElement('div');
@@ -129,10 +139,10 @@ const EchoPayment = {
         modal.innerHTML = `
             <div style="background:var(--bg,#fff);border-radius:24px;padding:32px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
                 <div style="font-size:48px;margin-bottom:16px;">💳</div>
-                <h3 style="font-size:20px;font-weight:900;color:var(--text,#1a1a2e);margin-bottom:8px;">確認訂閱</h3>
+                <h3 style="font-size:20px;font-weight:900;color:var(--text,#1a1a2e);margin-bottom:8px;">確認購買</h3>
                 <p style="font-size:14px;color:var(--text2,#666);margin-bottom:24px;line-height:1.6;">
-                    你即將訂閱 <strong>${plan.name}</strong><br>
-                    每月 <strong style="color:#6366F1;font-size:18px;">NT$ ${plan.price}</strong>
+                    你即將購買 <strong>${plan.name}</strong><br>
+                    <strong style="color:#6366F1;font-size:18px;">NT$ ${plan.price}</strong> / ${plan.duration} 天
                 </p>
 
                 <div style="background:var(--surface,#f5f5f5);border-radius:16px;padding:16px;margin-bottom:24px;text-align:left;">
@@ -147,7 +157,7 @@ const EchoPayment = {
 
                 <button onclick="EchoPayment._confirmDemoPayment('${uid}')"
                     style="width:100%;padding:14px;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;font-size:16px;font-weight:900;border:none;border-radius:16px;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.3);">
-                    👑 確認訂閱 — NT$ ${plan.price}/月
+                    👑 確認購買 — NT$ ${plan.price}
                 </button>
                 <button onclick="document.getElementById('payment-demo-modal').remove()"
                     style="width:100%;padding:12px;background:transparent;color:var(--text2,#666);font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:8px;">
@@ -192,27 +202,40 @@ const EchoPayment = {
     },
 
     /**
-     * 檢查 URL 參數處理付款回調
+     * 檢查 URL 參數處理付款回調（PAYUNi ReturnURL）
      */
     handlePaymentCallback() {
         const params = new URLSearchParams(window.location.search);
         const paymentStatus = params.get('payment');
 
         if (paymentStatus === 'success') {
-            // 付款成功 → 更新狀態
             const a = me();
             if (a) {
                 a.subscription = 'pro';
                 a.subscriptionStart = Date.now();
+                a.subscriptionEnd = Date.now() + (30 * 24 * 60 * 60 * 1000);
                 a.points += 200;
                 saveGlobal();
                 showCelebration('👑', '付款成功！', '歡迎加入 ECHO PRO，所有特權已解鎖！');
             }
-            // 清除 URL 參數
             window.history.replaceState({}, '', window.location.pathname);
         } else if (paymentStatus === 'cancel') {
             showToast('付款已取消，你可以隨時再試');
             window.history.replaceState({}, '', window.location.pathname);
+        }
+    },
+
+    /**
+     * 檢查 PRO 是否到期
+     */
+    checkExpiry(uid) {
+        const a = globalData.accounts[uid];
+        if (!a || a.subscription !== 'pro') return;
+
+        if (a.subscriptionEnd && Date.now() > a.subscriptionEnd) {
+            a.subscription = 'free';
+            saveGlobal();
+            console.log('[EchoPayment] PRO 已到期，恢復免費版');
         }
     }
 };

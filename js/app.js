@@ -1,7 +1,8 @@
 /* ==============================================
-   ECHO 回聲 V1.06 — 角色身份統一重構
+   ECHO 回聲 V1.07 — PAYUNi 金流整合（POC Demo）
+   + 角色身份統一重構
    + Streak System + Daily Quests
-   + Firebase Auth + Firestore + Stripe Payment
+   + Firebase Auth + Firestore + PAYUNi Payment
    + Full Feature Fix + Auth + Guild + Sound
    + Publisher Names + Task Dashboard + AI Humor
    ============================================== */
@@ -317,10 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
         EchoDb.init();
     }
 
-    // 4. Initialize Payment
+    // 4. Initialize Payment (PAYUNi / Demo)
     if (typeof EchoPayment !== 'undefined') {
         EchoPayment.init();
         EchoPayment.handlePaymentCallback();
+        // 檢查 PRO 是否到期
+        const uid = (typeof EchoAuth !== 'undefined' && EchoAuth.getUid) ? EchoAuth.getUid() : null;
+        if (uid) EchoPayment.checkExpiry(uid);
     }
 
     // 5. Force restore demo tasks if empty or too few for a good demo
