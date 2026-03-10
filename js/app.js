@@ -1,5 +1,7 @@
 /* ==============================================
-   ECHO 回聲 V1.03 — Full Feature Fix + Auth + Guild + Sound
+   ECHO 回聲 V1.05 — Streak System + Daily Quests
+   + Firebase Auth + Firestore + Stripe Payment
+   + Full Feature Fix + Auth + Guild + Sound
    + Publisher Names + Task Dashboard + AI Humor
    ============================================== */
 
@@ -48,6 +50,9 @@ const DEFAULT_REWARDS = [
     { sku: 'R3', title: '🎮 30分鐘遊戲時間', desc: '額外30分鐘螢幕時間', cost: 100, icon: '🎮', stock: 5, custom: false },
     { sku: 'R4', title: '🌟 神秘驚喜盒', desc: '家長準備的驚喜小禮物', cost: 200, icon: '🎁', stock: 2, custom: false },
     { sku: 'R5', title: '🏕️ 週末戶外冒險', desc: '家長帶你去戶外探險', cost: 300, icon: '🏕️', stock: 1, custom: false },
+    // V1.05: New streak & boost items
+    { sku: 'SF1', title: '🛡️ 護盾藥水', desc: '保護連續冒險紀錄 1 天不中斷（最多持有 3 個）', cost: 100, icon: '🛡️', type: 'STREAK_FREEZE', stock: 10, custom: false },
+    { sku: 'XP2', title: '⚡ 雙倍 XP 藥劑', desc: '接下來 1 小時內所有任務 XP 加倍！', cost: 150, icon: '⚡', type: 'XP_BOOST', stock: 5, custom: false },
 ];
 
 const ACHIEVEMENTS = [
@@ -62,7 +67,11 @@ const ACHIEVEMENTS = [
     { id: 'lvl10', icon: '🌟', name: '爐火純青', desc: '達到等級10', check: s => s.level >= 10 },
     { id: 'lvl20', icon: '🏆', name: '傳奇英雄', desc: '達到滿級Lv.20', check: s => s.level >= 20 },
     { id: 'first_blood', icon: '🩸', name: '第一滴血', desc: '第一次達成委託', check: s => s.completedCount >= 1 },
-    { id: 'shopaholic', icon: '🛍️', name: '購物狂', desc: '兌換過3次獎勵', check: s => (s.redemptions || []).length >= 3 }
+    { id: 'shopaholic', icon: '🛍️', name: '購物狂', desc: '兌換過3次獎勵', check: s => (s.redemptions || []).length >= 3 },
+    // V1.05: Streak achievements
+    { id: 'streak7', icon: '🔥', name: '七日烈焰', desc: '連續冒險 7 天', check: s => (s.streakCount || 0) >= 7 },
+    { id: 'streak30', icon: '💎', name: '月之守護', desc: '連續冒險 30 天', check: s => (s.streakCount || 0) >= 30 },
+    { id: 'streak100', icon: '👑', name: '百日王者', desc: '連續冒險 100 天', check: s => (s.streakCount || 0) >= 100 }
 ];
 
 // MONSTER POOL for daily battles
@@ -207,14 +216,37 @@ function defaultAccount(name) {
         achievements: [], redemptions: [], activeSub: null,
         battlesWon: 0, lastBattleDate: null, potions: 0,
         consecutiveLogins: 0, lastDailyClaim: null,
-        equipment: [], avatarUrl: null, tasksPublished: 0
+        equipment: [], avatarUrl: null, tasksPublished: 0,
+        // V1.05 Streak System
+        streakCount: 0, streakLastActiveDate: null, streakFreezeCount: 0,
+        // V1.05 Daily Quests
+        dailyQuests: null, dailyQuestsDate: null, dailyQuestsProgress: {}, dailyQuestsAllClaimed: false,
+        // V1.05 XP Boost
+        xpBoostUntil: null
     };
 }
 function loadGlobal() {
     try { const r = localStorage.getItem('echo3'); if (r) return JSON.parse(r); } catch (e) { }
     return defaultGlobal();
 }
-function saveGlobal() { localStorage.setItem('echo3', JSON.stringify(globalData)); }
+function saveGlobal() {
+    localStorage.setItem('echo3', JSON.stringify(globalData));
+    // Debounced cloud sync (avoid excessive writes)
+    _debouncedCloudSync();
+}
+
+let _cloudSyncTimer = null;
+function _debouncedCloudSync() {
+    if (_cloudSyncTimer) clearTimeout(_cloudSyncTimer);
+    _cloudSyncTimer = setTimeout(() => {
+        const uid = (typeof EchoAuth !== 'undefined') ? EchoAuth.getUid() : null;
+        if (uid && typeof EchoDb !== 'undefined' && EchoDb.isReady()) {
+            EchoDb.saveUserData(uid).catch(err => {
+                console.warn('[ECHO] Cloud sync failed:', err);
+            });
+        }
+    }, 2000); // 2 seconds debounce
+}
 
 // Simple password hash (POC level - not production crypto)
 function simpleHash(str) {
@@ -260,16 +292,47 @@ function getPlayerStats(acc) {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Force restore demo tasks if empty or too few for a good demo
+    // 1. Initialize Firebase (if configured)
+    const fbReady = (typeof initFirebase === 'function') ? initFirebase() : false;
+    const fbConfigured = (typeof isFirebaseConfigured === 'function') ? isFirebaseConfigured() : false;
+
+    // Show Firebase status indicator
+    const statusEl = document.getElementById('firebase-status');
+    if (statusEl) {
+        if (fbReady && fbConfigured) {
+            statusEl.innerHTML = '<span style="color:#10B981;">● 雲端模式</span>';
+        } else {
+            statusEl.innerHTML = '<span style="color:#F59E0B;">● 本地模式（Demo）</span>';
+        }
+    }
+
+    // 2. Initialize Auth module
+    if (typeof EchoAuth !== 'undefined') {
+        EchoAuth.init();
+    }
+
+    // 3. Initialize Firestore
+    if (typeof EchoDb !== 'undefined') {
+        EchoDb.init();
+    }
+
+    // 4. Initialize Payment
+    if (typeof EchoPayment !== 'undefined') {
+        EchoPayment.init();
+        EchoPayment.handlePaymentCallback();
+    }
+
+    // 5. Force restore demo tasks if empty or too few for a good demo
     if (globalData.tasks.length < 3) {
         seedDemoTasks();
     }
 
-    // Data Migration: ensure rewards have stock
+    // 6. Data Migration: ensure rewards have stock
     globalData.rewards.forEach(r => {
         if (r.stock === undefined) r.stock = 5;
     });
 
+    // 7. Check existing session
     if (globalData.activeId && me()) {
         const a = me();
         if (!a.name || a.name === '冒險者') {
@@ -294,43 +357,36 @@ function seedDemoTasks() {
 }
 
 // ===== AUTH =====
-function doLoginStep1() {
+async function doLoginStep1() {
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value.trim();
     if (!email) { showToast('請輸入冒險者聯絡 Email！'); return; }
     if (!password) { showToast('請輸入密碼！'); return; }
+    if (password.length < 6) { showToast('密碼至少需要 6 個字元！'); return; }
 
-    // POC: check if existing account with this email
-    let accId = null;
-    for (const [id, acc] of Object.entries(globalData.accounts)) {
-        if (acc.email === email) { accId = id; break; }
-    }
+    // Disable button during auth
+    const btn = document.getElementById('auth-login-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner"></i> 登入中...'; }
 
-    if (accId) {
-        // Existing user — validate password
-        const acc = globalData.accounts[accId];
-        if (acc.p_hash && acc.p_hash !== '***' && acc.p_hash !== simpleHash(password)) {
-            showToast('❌ 密碼錯誤，請重新輸入！'); return;
+    try {
+        const result = await EchoAuth.loginWithEmail(email, password);
+
+        if (result.success) {
+            if (result.isNew) {
+                showScreen('screen-auth-step2');
+            } else {
+                const a = me();
+                if (a && (!a.name || a.name === '冒險者' || !a.avatarUrl)) {
+                    showScreen('screen-auth-step2');
+                } else {
+                    enterApp();
+                }
+            }
         }
-        globalData.activeId = accId;
-        saveGlobal();
-        if (!me().avatarUrl) {
-            showScreen('screen-auth-step2');
-            showToast('歡迎回來！請完成你的冒險者檔案');
-        } else {
-            enterApp();
-            showToast(`歡迎回來，${me().name}！`);
-        }
-    } else {
-        // New user — create account stub, go to step 2
-        accId = 'U' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
-        globalData.accounts[accId] = defaultAccount('冒險者');
-        globalData.accounts[accId].email = email;
-        globalData.accounts[accId].p_hash = simpleHash(password);
-        globalData.activeId = accId;
-        saveGlobal();
-        showScreen('screen-auth-step2');
-        showToast('契約已建立！請輸入你的資訊');
+    } catch (err) {
+        console.error('Login error:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph-bold ph-sign-in"></i> 登入 / 註冊'; }
     }
 }
 
@@ -380,8 +436,30 @@ function cleanLocation(loc) {
 // Legacy doLogin for backward compatibility
 function doLogin() { doLoginStep1(); }
 
-function doGoogleLogin() {
-    showToast('🔧 Google 登入功能開發中，敬請期待！');
+async function doGoogleLogin() {
+    const btn = document.getElementById('auth-google-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '登入中...'; }
+
+    try {
+        const result = await EchoAuth.loginWithGoogle();
+
+        if (result.success) {
+            if (result.isNew) {
+                showScreen('screen-auth-step2');
+            } else {
+                const a = me();
+                if (a && (!a.name || a.name === '冒險者')) {
+                    showScreen('screen-auth-step2');
+                } else {
+                    enterApp();
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Google login error:', err);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 48 48" width="20" height="20"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.9 23.9 0 000 24c0 3.77.9 7.34 2.44 10.51l8.09-5.92z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-8.09 5.92C6.51 42.62 14.62 48 24 48z"/></svg> 使用 Google 登入'; }
+    }
 }
 
 function loginAs(name) {
@@ -404,11 +482,21 @@ function loginAs(name) {
     }
 }
 
-function doLogout() {
-    globalData.activeId = null;
-    saveGlobal();
-    document.getElementById('main-nav').style.display = 'none';
-    showScreen('screen-auth');
+async function doLogout() {
+    // Sync data to cloud before logout
+    const uid = EchoAuth.getUid();
+    if (uid && typeof EchoDb !== 'undefined' && EchoDb.isReady()) {
+        await EchoDb.saveUserData(uid);
+    }
+    // Firebase logout
+    if (typeof EchoAuth !== 'undefined') {
+        await EchoAuth.logout();
+    } else {
+        globalData.activeId = null;
+        saveGlobal();
+        document.getElementById('main-nav').style.display = 'none';
+        showScreen('screen-auth');
+    }
 }
 
 // ===== CHARACTER =====
@@ -619,6 +707,12 @@ function enterApp() {
     showScreen('screen-home');
     refreshAll();
 
+    // V1.05: Initialize Daily Quests
+    if (typeof EchoDailyQuests !== 'undefined') {
+        EchoDailyQuests.initQuests(me());
+        EchoDailyQuests.refreshQuestsUI();
+    }
+
     checkDailyLogin();
 
     // Setup Random Character Dialogues
@@ -755,7 +849,7 @@ let detailReturnScreen = 'screen-home';
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('hidden', s.id !== id));
     currentScreen = id;
-    if (id === 'screen-home') { refreshHUD(); renderTaskFeed(); refreshDailyBanner(); refreshWheelHint(); }
+    if (id === 'screen-home') { refreshHUD(); renderTaskFeed(); refreshDailyBanner(); refreshWheelHint(); if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.refreshQuestsUI(); }
     if (id === 'screen-dashboard') { renderDashboard('week'); }
     if (id === 'screen-mytasks') renderMyTasks();
     if (id === 'screen-rewards') { renderRewards(); }
@@ -804,6 +898,12 @@ function refreshHUD() {
 
     const elStreak = document.getElementById('streak-val');
     if (elStreak) elStreak.textContent = a.consecutiveLogins;
+
+    // V1.05: Streak badge in HUD
+    const streakBadgeEl = document.getElementById('hud-streak-badge');
+    if (streakBadgeEl && typeof EchoStreak !== 'undefined') {
+        streakBadgeEl.innerHTML = EchoStreak.renderStreakBadge(a);
+    }
 
     const xpCur = xpForLevel(a.level);
     const xpNxt = xpForLevel(a.level + 1);
@@ -1261,8 +1361,13 @@ function goBackFromDetail() { showScreen(detailReturnScreen); }
 function toggleCheckItem(taskId, index) {
     const t = globalData.tasks.find(x => x.id === taskId);
     if (!t || !t.checklist || t.claimedBy !== myId()) return;
+    const wasChecked = t.checklist[index].done;
     t.checklist[index].done = !t.checklist[index].done;
     saveGlobal();
+    // V1.05: Daily Quests — checklist check event (only on check, not uncheck)
+    if (!wasChecked && t.checklist[index].done && typeof EchoDailyQuests !== 'undefined') {
+        EchoDailyQuests.notifyEvent('checklist_check', 1);
+    }
     openDetail(taskId);
 }
 
@@ -1366,6 +1471,8 @@ function publishTask() {
     saveGlobal();
     showToast('🎉 委託已發布！');
     checkAchievements();
+    // V1.05: Daily Quests — task publish event
+    if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.notifyEvent('task_publish', 1);
     showScreen('screen-home');
 }
 
@@ -1380,6 +1487,8 @@ function claimTask(id) {
     t.status = 'CLAIMED'; t.claimedBy = myId(); t.claimedAt = Date.now();
     saveGlobal();
     showToast('💪 委託已接取！加油！');
+    // V1.05: Daily Quests — task claim event
+    if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.notifyEvent('task_claim', 1);
     openDetail(id);
 }
 
@@ -1400,7 +1509,12 @@ function confirmComplete(id) {
     // Award XP+Points to the claimer
     const claimerAcc = globalData.accounts[t.claimedBy];
     if (claimerAcc) {
-        const xpG = XP_TABLE[t.difficulty] || 50, ptsG = Math.round(xpG * PTS_RATIO);
+        let xpG = XP_TABLE[t.difficulty] || 50;
+        // V1.05: XP Boost check
+        if (claimerAcc.xpBoostUntil && Date.now() < claimerAcc.xpBoostUntil) {
+            xpG *= 2;
+        }
+        const ptsG = Math.round(xpG * PTS_RATIO);
         claimerAcc.totalXP += xpG;
         claimerAcc.points += ptsG;
         claimerAcc.completedCount++;
@@ -1415,9 +1529,38 @@ function confirmComplete(id) {
         }
     }
 
+    // V1.05: Update Streak on task completion
+    if (typeof EchoStreak !== 'undefined' && claimerAcc) {
+        const streakResult = EchoStreak.onTaskCompleted(claimerAcc);
+        if (streakResult && streakResult.isNew) {
+            // Check milestone
+            const milestone = EchoStreak.checkMilestone(streakResult.streakCount);
+            if (milestone) {
+                claimerAcc.points += milestone.reward;
+                claimerAcc.totalXP += milestone.xp;
+                claimerAcc.level = calcLevel(claimerAcc.totalXP);
+                setTimeout(() => {
+                    showCelebration(milestone.icon, `🔥 連續冒險 ${milestone.days} 天！`, `${milestone.title} — +${milestone.reward} 金幣 +${milestone.xp} XP`);
+                    SoundManager.play('levelUp');
+                }, 2800);
+            }
+            if (streakResult.usedFreeze) {
+                setTimeout(() => showToast('🛡️ 護盾藥水自動啟用！Streak 保住了！'), 1500);
+            }
+        }
+    }
+
+    // V1.05: Update Daily Quests progress
+    if (typeof EchoDailyQuests !== 'undefined') {
+        EchoDailyQuests.notifyEvent('task_complete', 1);
+        const earnedXP = claimerAcc ? (XP_TABLE[t.difficulty] || 50) * ((claimerAcc.xpBoostUntil && Date.now() < claimerAcc.xpBoostUntil) ? 2 : 1) : (XP_TABLE[t.difficulty] || 50);
+        EchoDailyQuests.notifyEvent('xp_earn', earnedXP);
+    }
+
     saveGlobal(); checkAchievements();
-    const xpG = XP_TABLE[t.difficulty] || 50, ptsG = Math.round(xpG * PTS_RATIO);
-    showCelebration('🎉', '委託確認通過！', `獎勵 + ${xpG} XP + ${ptsG}金幣 已發送`);
+    const xpDisplay = claimerAcc ? (XP_TABLE[t.difficulty] || 50) * ((claimerAcc.xpBoostUntil && Date.now() < claimerAcc.xpBoostUntil) ? 2 : 1) : (XP_TABLE[t.difficulty] || 50);
+    const ptsDisplay = Math.round(xpDisplay * PTS_RATIO);
+    showCelebration('🎉', '委託確認通過！', `獎勵 + ${xpDisplay} XP + ${ptsDisplay}金幣 已發送`);
     setTimeout(() => openDetail(id), 2600);
 }
 
@@ -1634,6 +1777,36 @@ function confirmPurchase() {
     // Deduct stock
     r.stock--;
 
+    // V1.05: Streak Freeze
+    if (r.type === 'STREAK_FREEZE') {
+        if (typeof EchoStreak !== 'undefined') {
+            const result = EchoStreak.buyStreakFreeze(a);
+            if (!result.success) {
+                r.stock++; // Restore stock
+                if (result.reason === 'max_reached') showToast('🛡️ 護盾藥水最多持有 3 個！');
+                else showToast('金幣不足！');
+                return;
+            }
+        } else {
+            a.points -= r.cost;
+            a.streakFreezeCount = (a.streakFreezeCount || 0) + 1;
+        }
+        SoundManager.play('skill');
+        showCelebration('🛡️', '護盾藥水入手！', `連續冒險保護器 × ${a.streakFreezeCount || 1}`);
+        saveGlobal(); renderRewards();
+        if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.notifyEvent('reward_redeem', 1);
+        return;
+    }
+    // V1.05: XP Boost
+    if (r.type === 'XP_BOOST') {
+        a.points -= r.cost;
+        a.xpBoostUntil = Date.now() + (60 * 60 * 1000); // 1 hour
+        SoundManager.play('skill');
+        showCelebration('⚡', '雙倍 XP 啟動！', '接下來 1 小時所有任務 XP 加倍！');
+        saveGlobal(); renderRewards();
+        if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.notifyEvent('reward_redeem', 1);
+        return;
+    }
     // Potions go into inventory instead of immediate use
     if (r.type === 'POTION' || sku === 'R0') {
         a.points -= r.cost;
@@ -1662,6 +1835,8 @@ function confirmPurchase() {
         a.redemptions.push({ sku, at: Date.now() });
     }
 
+    // V1.05: Daily Quests — reward redeem event
+    if (typeof EchoDailyQuests !== 'undefined') EchoDailyQuests.notifyEvent('reward_redeem', 1);
     saveGlobal(); checkAchievements();
     showCelebration(r.icon, '兌換成功！', r.title);
     setTimeout(() => renderRewards(), 2600);
@@ -1730,11 +1905,17 @@ function processRedeemCode() {
 }
 
 function activateSubscription() {
-    const a = me(); if (!a) return;
-    a.subscription = 'pro'; a.points += 200;
-    saveGlobal(); closePaywall();
-    showCelebration('👑', '歡迎加入 Pro！', '獲得 200 回聲金幣禮包');
-    setTimeout(() => refreshAll(), 2600);
+    // 使用新的 Payment 模組
+    if (typeof EchoPayment !== 'undefined') {
+        EchoPayment.startCheckout('pro_monthly');
+    } else {
+        // Fallback: 原始 POC 模式
+        const a = me(); if (!a) return;
+        a.subscription = 'pro'; a.points += 200;
+        saveGlobal(); closePaywall();
+        showCelebration('👑', '歡迎加入 Pro！', '獲得 200 回聲金幣禮包');
+        setTimeout(() => refreshAll(), 2600);
+    }
 }
 function closePaywall() { document.getElementById('paywall-modal').classList.remove('active'); }
 function openPaywall() { document.getElementById('paywall-modal').classList.add('active'); }
@@ -2104,6 +2285,11 @@ function battleWin() {
     const oldLvl = a.level;
     a.level = calcLevel(a.totalXP);
     if (a.level > oldLvl) a.currentHp = 100 + a.level * 10 + (bs.player.def * 2); // Free heal on level up
+    // V1.05: Daily Quests — battle win event
+    if (typeof EchoDailyQuests !== 'undefined') {
+        EchoDailyQuests.notifyEvent('battle_win', 1);
+        EchoDailyQuests.notifyEvent('xp_earn', xpGain);
+    }
     saveGlobal(); checkAchievements();
 
     bs.log.push(`<span class="log-win">🎉 擊敗了第 ${bs.layer} 層魔王！獲得 + ${xpGain} XP · +${ptsGain} 金幣！</span>`);

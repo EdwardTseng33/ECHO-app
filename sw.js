@@ -3,7 +3,7 @@
 // Cache-first for static assets, network-first for API
 // ============================================
 
-const CACHE_NAME = 'echo-v1.03-cache';
+const CACHE_NAME = 'echo-v1.05-cache';
 const OFFLINE_URL = '/';
 
 const PRECACHE_ASSETS = [
@@ -11,6 +11,13 @@ const PRECACHE_ASSETS = [
   '/index.html',
   '/css/styles.css',
   '/js/app.js',
+  '/js/firebase-config.js',
+  '/js/firebase-auth.js',
+  '/js/firebase-db.js',
+  '/js/payment.js',
+  '/js/echo-streak.js',
+  '/js/echo-dailyquests.js',
+  '/js/gcal.js',
   '/manifest.json',
   '/img/icons/icon-192x192.png',
   '/img/icons/icon-512x512.png',

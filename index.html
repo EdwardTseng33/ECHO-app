@@ -89,8 +89,17 @@
     <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Background Removal Utility -->
-    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/background-removal.js"></script>
+    <!-- Background Removal Utility (Lazy Load) -->
+    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/background-removal.js" defer></script>
+
+    <!-- Firebase SDK (v9 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/" defer></script>
+
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .form-group select {
@@ -152,14 +161,14 @@
                             <input id="auth-password" type="password" placeholder="輸入密碼"
                                 autocomplete="current-password">
                         </div>
-                        <button class="btn btn-primary btn-block auth-login-btn" onclick="doLoginStep1()">
+                        <button class="btn btn-primary btn-block auth-login-btn" onclick="doLoginStep1()" id="auth-login-btn">
                             <i class="ph-bold ph-sign-in"></i> 登入 / 註冊
                         </button>
                     </div>
 
                     <div class="auth-divider"><span>或</span></div>
 
-                    <button class="btn btn-google btn-block" onclick="doGoogleLogin()">
+                    <button class="btn btn-google btn-block" onclick="doGoogleLogin()" id="auth-google-btn">
                         <svg viewBox="0 0 48 48" width="20" height="20">
                             <path fill="#EA4335"
                                 d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -172,11 +181,14 @@
                         </svg>
                         使用 Google 登入
                     </button>
+
+                    <!-- Firebase 連線狀態指示 -->
+                    <div id="firebase-status" style="text-align:center;margin-top:8px;font-size:11px;color:var(--text3,#999);font-weight:600;"></div>
                 </div>
 
                 <div class="auth-footer">
                     <span>開始即代表同意</span>
-                    <a href="#">服務條款</a> 與 <a href="#">隱私政策</a>
+                    <a href="/terms.html" target="_blank">服務條款</a> 與 <a href="/privacy.html" target="_blank">隱私政策</a>
                 </div>
             </div>
         </div>
@@ -336,7 +348,9 @@
                             style="font-size:22px; font-weight:900; color:var(--text); line-height:1.2; margin-bottom:10px;">
                             <span id="hud-charname">冒險者</span>，<br>歡迎回來！
                         </div>
-                        <div id="hud-guild-badge" class="guild-inline-badge" style="display:none; margin-bottom:8px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+                            <div id="hud-guild-badge" class="guild-inline-badge" style="display:none;"></div>
+                            <div id="hud-streak-badge"></div>
                         </div>
                         <div class="xp-section" style="margin: 0; padding:0;">
                             <div class="xp-header"
@@ -414,6 +428,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- V1.05: Daily Quests -->
+            <div style="padding:0 16px 8px" id="daily-quests-container"></div>
 
             <div class="section-header">
                 <h2>委託看板</h2>
@@ -875,12 +892,12 @@
                     </li>
                 </ul>
 
-                <button class="btn btn-primary btn-block" id="sub-action-btn" onclick="activateSubscription()"
+                <button class="btn btn-primary btn-block" id="sub-action-btn" onclick="EchoPayment.startCheckout('pro_monthly')"
                     style="font-size:16px; padding:14px; border-radius:16px; font-weight:900;">
                     👑 立即升級 PRO — $59/月
                 </button>
                 <p style="text-align:center; font-size:11px; color:var(--text3); margin-top:12px; line-height:1.5;">
-                    隨時可取消 · 7 天免費試用 · 安全付款
+                    隨時可取消 · 7 天免費試用 · Stripe 安全付款
                 </p>
                 <button class="btn btn-secondary btn-block mt-2"
                     onclick="showScreen('screen-character')">先繼續免費冒險</button>
@@ -988,6 +1005,17 @@
                 </button>
                 <div id="wheel-result" style="margin-top:16px;font-size:16px;font-weight:900;color:var(--primary)">
                 </div>
+            </div>
+        </div>
+
+        <!-- V1.05: STREAK DETAIL MODAL -->
+        <div class="modal-overlay" id="streak-detail-modal" style="display:none;" onclick="if(event.target===this)EchoStreak.closeStreakDetail()">
+            <div class="modal-sheet" style="padding:24px; max-height:80vh; overflow-y:auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div style="font-weight:900; font-size:16px;">🔥 連續冒險紀錄</div>
+                    <button onclick="EchoStreak.closeStreakDetail()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text3);">✕</button>
+                </div>
+                <div id="streak-detail-content"></div>
             </div>
         </div>
 
@@ -1183,8 +1211,17 @@
         </nav>
 
         <!-- Version Tag -->
-        <div class="version-tag">V1.03</div>
+        <div class="version-tag">V1.05</div>
     </div>
+
+    <!-- Firebase Modules (must load before app.js) -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-auth.js"></script>
+    <script src="js/firebase-db.js"></script>
+    <script src="js/payment.js"></script>
+    <!-- V1.05: Streak + Daily Quests -->
+    <script src="js/echo-streak.js"></script>
+    <script src="js/echo-dailyquests.js"></script>
 
     <!-- Google API & Calendar Integration -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
