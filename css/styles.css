@@ -580,7 +580,193 @@ body::before {
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-/* HOME PROFILE HEADER */
+/* ===== HOME: Compact HUD Bar ===== */
+.home-hud-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+}
+
+.home-hud-avatar {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.home-hud-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.home-hud-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.home-hud-name {
+    font-size: var(--fs-body);
+    font-weight: 800;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-hud-xp-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+}
+
+.home-hud-level {
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    color: #fff;
+    background: var(--primary);
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.home-hud-xp-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(0,0,0,0.06);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+.home-hud-xp-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), #a855f7);
+    border-radius: var(--radius-pill);
+    transition: width 0.5s ease;
+}
+
+.home-hud-xp-text {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    color: var(--text3);
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+.home-hud-coins {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-body-sm);
+    font-weight: 800;
+    color: var(--primary);
+    background: rgba(99,102,241,0.08);
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+/* ===== HOME: Quick Actions Row ===== */
+.home-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 16px 20px 8px;
+}
+
+.home-action-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.home-action-card:active {
+    transform: scale(0.97);
+}
+
+.home-action-battle {
+    background: linear-gradient(135deg, #4338CA, #6366F1);
+    color: #fff;
+}
+
+.home-action-wheel {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    color: #fff;
+}
+
+.home-action-emoji {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.home-action-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.home-action-title {
+    font-size: var(--fs-body-sm);
+    font-weight: 800;
+}
+
+.home-action-hint {
+    font-size: var(--fs-xs);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+/* ===== HOME: Section Spacing ===== */
+.home-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 10px;
+}
+
+.home-section-header h2 {
+    font-size: var(--fs-subtitle);
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.home-section-header a {
+    font-size: var(--fs-caption);
+    color: var(--primary);
+    font-weight: 800;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.home-section-wrap {
+    padding: 0 20px 8px;
+}
+
+/* HOME PROFILE HEADER (legacy - kept for reference) */
 .home-profile-card {
     display: flex;
     align-items: center;
@@ -719,9 +905,7 @@ body::before {
 
 /* CUSTOM AVATAR ANIMATIONS */
 .avatar-animated {
-    animation: avatarIdle 3s ease-in-out infinite;
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .avatar-animated.talking {
@@ -861,16 +1045,16 @@ body::before {
 
 .char-profile-avatar-container {
     position: relative;
-    width: 110px;
-    height: 110px;
-    margin: 0 auto 12px;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
 }
 
 .char-profile-avatar {
-    width: 102px;
-    height: 102px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
-    margin: 4px;
+    margin: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -883,8 +1067,8 @@ body::before {
 }
 
 .char-profile-avatar img {
-    width: 100%;
-    height: 100%;
+    width: 85%;
+    height: 85%;
     object-fit: contain;
 }
 
@@ -914,6 +1098,15 @@ body::before {
 
 .char-profile-avatar .char-big {
     font-size: 60px;
+    animation: none;
+}
+
+.char-profile-avatar .char-big img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: none !important;
+    transform: none !important;
 }
 
 .avatar-edit-badge i {
@@ -1021,7 +1214,6 @@ body::before {
 .char-big {
     font-size: var(--fs-icon-lg);
     filter: drop-shadow(0 4px 16px rgba(255, 215, 0, .4));
-    animation: charFloat 3s ease-in-out infinite
 }
 
 @keyframes charFloat {
@@ -1051,7 +1243,6 @@ body::before {
 
 .char-big.tier-3 {
     filter: drop-shadow(0 4px 24px rgba(255, 215, 0, .6)) drop-shadow(0 0 40px rgba(255, 107, 0, .4));
-    animation: charFloat 2s ease-in-out infinite, tierGlow 2s ease-in-out infinite alternate
 }
 
 @keyframes tierGlow {
@@ -1159,7 +1350,7 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 16px 10px
+    padding: 20px 20px 10px;
 }
 
 .section-header h2 {
@@ -1176,7 +1367,7 @@ body::before {
 }
 
 .section-pad {
-    padding: 0 16px
+    padding: 0 20px;
 }
 
 /* DETAIL VIEW */
@@ -2576,10 +2767,9 @@ select:focus {
     transform-origin: bottom center;
 }
 
-/* Idle select bob animation with squash and stretch to mimic body movement */
+/* Char select — static display */
 .char-avatar img {
-    animation: charSelectOrganic 3s ease-in-out infinite;
-    will-change: transform
+    will-change: auto
 }
 
 .char-option:nth-child(1) .char-avatar img {
@@ -2626,21 +2816,10 @@ select:focus {
     }
 }
 
-/* Profile char image deep breathing animation */
+/* Character images: NO animation — static display for clean rendering */
 .char-big img {
-    animation: charProfileBreathe 4s ease-in-out infinite
-}
-
-@keyframes charProfileBreathe {
-
-    0%,
-    100% {
-        transform: scale(1.1) translateY(0) scaleY(1)
-    }
-
-    50% {
-        transform: scale(1.1) translateY(-6px) scaleY(1.04) scaleX(0.98)
-    }
+    animation: none;
+    transform: none;
 }
 
 /* HUD character icon — subtle pulse */
@@ -2711,22 +2890,7 @@ select:focus {
     overflow: visible
 }
 
-/* Profile char image breathing animation */
-.char-big img {
-    animation: charProfileBreathe 3s ease-in-out infinite
-}
-
-@keyframes charProfileBreathe {
-
-    0%,
-    100% {
-        transform: scale(1) translateY(0)
-    }
-
-    50% {
-        transform: scale(1.05) translateY(-4px)
-    }
-}
+/* Profile char — static, no animation (duplicate block removed) */
 
 /* HUD character icon — subtle pulse */
 .hud-chip img {
@@ -2764,18 +2928,6 @@ select:focus {
     to {
         opacity: 1;
         transform: translateY(0)
-    }
-}
-
-@keyframes charFloat {
-
-    0%,
-    100% {
-        transform: scale(1.1) translateY(0);
-    }
-
-    50% {
-        transform: scale(1.1) translateY(-6px);
     }
 }
 

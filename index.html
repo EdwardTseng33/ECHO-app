@@ -331,112 +331,57 @@
 
         <!-- ===== HOME (TASK WALL) ===== -->
         <div class="screen hidden" id="screen-home">
-            <div class="topbar" style="border-bottom:none; padding-bottom: 0px; min-height: 0px; padding-top: 0px;">
-                <!-- Title removed as per user request -->
-            </div>
-            <div class="home-profile-card"
-                style="position:relative; flex-direction:column; gap:12px; padding:24px; margin: 16px 16px 20px; border-radius:18px; background: linear-gradient(135deg, var(--surface), #ffffff); border: 1px solid var(--border);">
-                <div style="display:flex; width:100%; align-items:center; gap:20px;">
-                    <div class="home-avatar" id="hud-char-icon"
-                        style="width:90px; height:90px; min-width:90px; border-radius:50%; background:var(--bg); border:3px solid var(--primary); display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow: 0 8px 16px rgba(99,102,241,0.15);">
-                        🧙</div>
-                    <div class="home-profile-info" style="flex:1;">
-                        <div
-                            style="font-size:13px; font-weight:900; color:var(--primary); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">
-                            傳奇冒險者</div>
-                        <div class="home-greeting"
-                            style="font-size:22px; font-weight:900; color:var(--text); line-height:1.2; margin-bottom:10px;">
-                            <span id="hud-charname">冒險者</span>，<br>歡迎回來！
+            <!-- Compact HUD Bar -->
+            <div class="home-hud-bar">
+                <div class="home-hud-avatar" id="hud-char-icon">🧙</div>
+                <div class="home-hud-info">
+                    <div class="home-hud-name"><span id="hud-charname">冒險者</span></div>
+                    <div class="home-hud-xp-row">
+                        <span class="home-hud-level" id="hud-level-badge"><i class="ph-fill ph-star"></i> Lv.<span id="hud-level">1</span></span>
+                        <div class="home-hud-xp-track">
+                            <div class="home-hud-xp-fill" id="xp-fill"></div>
                         </div>
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                            <div id="hud-guild-badge" class="guild-inline-badge" style="display:none;"></div>
-                            <div id="hud-streak-badge"></div>
-                        </div>
-                        <div class="xp-section" style="margin: 0; padding:0;">
-                            <div class="xp-header"
-                                style="margin-bottom: 6px; display:flex; justify-content:space-between; align-items:baseline;">
-                                <span class="home-stat-badge level"
-                                    style="width:auto; padding:2px 10px; font-size:11px; background:var(--primary); color:white; border:none; margin-right:8px;"><i
-                                        class="ph-fill ph-star"></i> Lv.<span id="hud-level">1</span></span>
-                                <span id="xp-current"
-                                    style="font-weight: 800; font-size:11px; flex:1; color:var(--text2);">0 / 50
-                                    XP</span>
-                                <span class="xp-lvl" id="xp-next"
-                                    style="font-size: 11px; color:var(--text3); font-weight:700;">→ Lv.2</span>
-                            </div>
-                            <div class="xp-track"
-                                style="height: 10px; border-radius: 5px; background:rgba(0,0,0,0.05);">
-                                <div class="xp-fill" id="xp-fill"
-                                    style="width:0%; border-radius: 5px; background: linear-gradient(90deg, var(--primary), #a855f7);">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="char-dialogue-bubble" id="home-char-bubble"
-                        style="transform: scale(0.9); max-width:180px;"></div>
-                </div>
-
-                <div class="home-stats-row" style="grid-template-columns: repeat(4, 1fr); gap:6px; margin-top:8px;">
-                    <div class="home-stat-badge points" style="padding:8px 4px; flex-direction:column; gap:2px;"><i
-                            class="ph-bold ph-coin" style="font-size:16px;"></i>
-                        <span id="hud-points" style="font-size:14px;">0</span>
-                    </div>
-                    <div class="home-stat-badge"
-                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3)">
-                        <i class="ph-bold ph-flask" style="font-size:16px;"></i> <span id="hud-potions"
-                            style="font-size:14px; font-weight:900;">0</span>
-                    </div>
-                    <div class="home-stat-badge"
-                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(255, 107, 0, 0.15); color: #FF6B00; border: 1px solid rgba(255, 107, 0, 0.3)">
-                        <i class="ph-bold ph-sword" style="font-size:16px;"></i> <span id="hud-atk"
-                            style="font-size:14px;">15</span>
-                    </div>
-                    <div class="home-stat-badge"
-                        style="padding:8px 4px; flex-direction:column; gap:2px; background: rgba(0, 229, 255, 0.15); color: #00E5FF; border: 1px solid rgba(0, 229, 255, 0.3)">
-                        <i class="ph-bold ph-shield" style="font-size:16px;"></i> <span id="hud-def"
-                            style="font-size:14px;">5</span>
+                        <span class="home-hud-xp-text" id="xp-current">0/50</span>
                     </div>
                 </div>
+                <div class="home-hud-coins"><i class="ph-bold ph-coin"></i> <span id="hud-points">0</span></div>
             </div>
+            <!-- Hidden elements for JS compatibility -->
+            <span id="xp-next" class="hidden"></span>
+            <span id="hud-potions" class="hidden">0</span>
+            <span id="hud-atk" class="hidden">0</span>
+            <span id="hud-def" class="hidden">0</span>
+            <div id="hud-guild-badge" class="hidden"></div>
+            <div id="hud-streak-badge" class="hidden"></div>
+            <div id="home-char-bubble" class="hidden"></div>
 
-            <!-- Daily Battle Banner -->
-            <div style="padding:0 16px 8px">
-                <div class="battle-banner" id="battle-banner" onclick="startDailyBattle()">
-                    <div class="battle-banner-bg"></div>
-                    <div class="battle-banner-content">
-                        <div class="battle-left">
-                            <div class="battle-label">🏰 無盡爬塔挑戰</div>
-                            <div class="battle-monster-name" id="daily-monster-name">突破極限</div>
-                            <div class="battle-hint" id="daily-battle-hint">點擊開始攀登！</div>
-                        </div>
-                        <div class="battle-monster-emoji" id="daily-monster-emoji">👹</div>
+            <!-- Quick Actions Row: Battle + Wheel -->
+            <div class="home-actions-row">
+                <div class="home-action-card home-action-battle" onclick="startDailyBattle()">
+                    <div class="home-action-emoji" id="daily-monster-emoji">👹</div>
+                    <div class="home-action-text">
+                        <div class="home-action-title" id="daily-monster-name">爬塔挑戰</div>
+                        <div class="home-action-hint" id="daily-battle-hint">點擊攀登！</div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Lucky Wheel Banner -->
-            <div style="padding:0 16px 8px">
-                <div class="card" style="cursor:pointer;border-color:rgba(255,215,0,.3)" onclick="openLuckyWheel()">
-                    <div class="flex items-center gap-2">
-                        <span style="font-size:32px;animation:charFloat 2s ease-in-out infinite">🎡</span>
-                        <div style="flex:1">
-                            <div style="font-weight:900;font-size:14px;color:var(--primary)">每日幸運轉盤</div>
-                            <div style="font-size:11px;color:var(--text2);font-weight:700" id="wheel-hint">今天還沒轉！免費一次
-                            </div>
-                        </div>
-                        <span style="font-size:18px">→</span>
+                <div class="home-action-card home-action-wheel" onclick="openLuckyWheel()">
+                    <div class="home-action-emoji">🎡</div>
+                    <div class="home-action-text">
+                        <div class="home-action-title">幸運轉盤</div>
+                        <div class="home-action-hint" id="wheel-hint">免費一次</div>
                     </div>
                 </div>
             </div>
 
             <!-- V1.05: Daily Quests -->
-            <div style="padding:0 16px 8px" id="daily-quests-container"></div>
+            <div class="home-section-wrap" id="daily-quests-container"></div>
 
-            <div class="section-header">
-                <h2>委託看板</h2>
-                <a href="#" onclick="showScreen('screen-create')">+ 發布委託</a>
+            <!-- Quest Board -->
+            <div class="home-section-header">
+                <h2><i class="ph-bold ph-clipboard-text"></i> 委託看板</h2>
+                <a href="#" onclick="showScreen('screen-create')"><i class="ph-bold ph-plus"></i> 發布委託</a>
             </div>
-            <div class="section-pad" id="task-feed"></div>
+            <div class="home-section-wrap" id="task-feed"></div>
         </div>
 
         <!-- ===== MY TASKS / PROGRESS ===== -->

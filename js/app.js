@@ -891,7 +891,7 @@ function refreshHUD() {
     const stats = getPlayerStats(a);
 
     const elIcon = document.getElementById('hud-char-icon');
-    if (elIcon) elIcon.innerHTML = getCharImg(a, 90, a.level, false);
+    if (elIcon) elIcon.innerHTML = getCharImg(a, 40, a.level, false);
 
     const elName = document.getElementById('hud-charname');
     if (elName) elName.textContent = a.name;
