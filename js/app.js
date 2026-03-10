@@ -1,5 +1,5 @@
 /* ==============================================
-   ECHO 回聲 V1.07 — PAYUNi 金流整合（POC Demo）
+   ECHO 回聲 V1.08 — CSS Design Token 重構
    + 角色身份統一重構
    + Streak System + Daily Quests
    + Firebase Auth + Firestore + PAYUNi Payment

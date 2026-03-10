@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Noto+Sans+TC:wght@500;700;900&display=swap');
 
 :root {
-    /* Soft, elegant Indigo/Royal Blue theme */
+    /* ===== COLOR TOKENS ===== */
     --bg: #F4F6FC;
     --bg2: #FFFFFF;
     --bg3: #E8EDF8;
@@ -15,18 +15,56 @@
     --glow: rgba(99, 102, 241, 0.15);
     --primary: #6366F1;
     --primary-dark: #4F46E5;
+    --primary-light: #818CF8;
     --secondary: #00B1D2;
     --pink: #F472B6;
     --green: #10B981;
+    --green-light: #34D399;
     --red: #FF4D4F;
     --orange: #F59E0B;
+    --gold: #FFD700;
+    --gold-dark: #FF8C00;
     --text: #1E293B;
     --text2: #64748B;
     --text3: #94A3B8;
-    --radius: 20px;
+    --text-inv: #FFFFFF;
+    --text-dark: #1a1040;
+
+    /* ===== RADIUS TOKENS ===== */
+    --radius-xs: 4px;
     --radius-sm: 12px;
+    --radius: 20px;
+    --radius-lg: 24px;
+    --radius-pill: 100px;
+    --radius-round: 50%;
+
+    /* ===== TYPE SCALE TOKENS ===== */
+    --fs-xs: 10px;
+    --fs-sm: 11px;
+    --fs-caption: 12px;
+    --fs-body-sm: 13px;
+    --fs-body: 14px;
+    --fs-body-lg: 15px;
+    --fs-subtitle: 16px;
+    --fs-title: 17px;
+    --fs-heading: 20px;
+    --fs-display-sm: 22px;
+    --fs-display: 28px;
+    --fs-display-lg: 32px;
+    --fs-hero: 42px;
+    --fs-icon-lg: 56px;
+    --fs-icon-xl: 72px;
+
+    /* ===== MISC ===== */
     --font: 'Nunito', 'PingFang TC', 'Noto Sans TC', sans-serif;
     --safe-b: env(safe-area-inset-bottom, 0px);
+
+    /* ===== Z-INDEX SCALE ===== */
+    --z-base: 1;
+    --z-nav: 50;
+    --z-modal: 100;
+    --z-toast: 9999;
+    --z-celebration: 10000;
 }
 
 * {
@@ -47,7 +85,7 @@ body {
     background: #E2E8F0;
     /* Darker backdrop */
     color: var(--text);
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     line-height: 1.5;
 }
 
@@ -83,7 +121,7 @@ select {
     border: 2px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 12px 14px;
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     outline: none;
     width: 100%;
     font-weight: 700
@@ -159,7 +197,7 @@ body::before {
 }
 
 .topbar h1 {
-    font-size: 17px;
+    font-size: var(--fs-title);
     font-weight: 800;
     letter-spacing: 0.3px;
     color: var(--text);
@@ -201,7 +239,7 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     border-radius: 50%;
     background: transparent;
     color: var(--text2);
@@ -242,7 +280,7 @@ body::before {
     justify-content: center;
     gap: 4px;
     padding: 8px 0;
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     color: var(--text3);
     transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -306,7 +344,7 @@ body::before {
     gap: 8px;
     padding: 14px 20px;
     border-radius: var(--radius-sm);
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     font-weight: 800;
     cursor: pointer;
     border: none;
@@ -321,7 +359,7 @@ body::before {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), #818CF8);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: white;
     border: none;
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
@@ -347,7 +385,7 @@ body::before {
 }
 
 .btn-green {
-    background: linear-gradient(135deg, #10B981, #34D399);
+    background: linear-gradient(135deg, #10B981, var(--green-light));
     color: white;
     border: none;
     box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
@@ -355,7 +393,7 @@ body::before {
 
 .btn-sm {
     padding: 10px 16px;
-    font-size: 12px;
+    font-size: var(--fs-caption);
     border-radius: var(--radius-sm)
 }
 
@@ -434,7 +472,7 @@ body::before {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 1.2px;
@@ -446,7 +484,7 @@ body::before {
 }
 
 .task-card h3 {
-    font-size: 17px;
+    font-size: var(--fs-title);
     font-weight: 900;
     margin-bottom: 4px;
     color: var(--text);
@@ -455,7 +493,7 @@ body::before {
 }
 
 .task-card .task-desc {
-    font-size: 14px;
+    font-size: var(--fs-body);
     color: var(--text2);
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -467,7 +505,7 @@ body::before {
 }
 
 .task-meta {
-    font-size: 12px;
+    font-size: var(--fs-caption);
     color: var(--text3);
     display: flex;
     gap: 12px;
@@ -484,7 +522,7 @@ body::before {
 }
 
 .reward-chip {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     padding: 4px 10px;
     border-radius: 12px;
@@ -511,7 +549,7 @@ body::before {
 }
 
 .status-badge {
-    font-size: 10px;
+    font-size: var(--fs-xs);
     padding: 4px 10px;
     border-radius: 12px;
     font-weight: 800;
@@ -563,7 +601,7 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: var(--fs-display-lg);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 }
 
@@ -575,7 +613,7 @@ body::before {
     border: 2px solid var(--border);
     padding: 8px 12px;
     border-radius: 16px 16px 16px 0;
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     color: var(--text);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
@@ -596,7 +634,7 @@ body::before {
 }
 
 .home-greeting {
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     font-weight: 800;
     color: var(--text);
     margin-bottom: 4px;
@@ -617,7 +655,7 @@ body::before {
     gap: 6px;
     padding: 6px 10px;
     border-radius: 12px;
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -649,7 +687,7 @@ body::before {
 .xp-header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     margin-bottom: 10px;
     letter-spacing: 0.5px;
@@ -658,7 +696,7 @@ body::before {
 
 .xp-header .xp-lvl {
     color: var(--primary);
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 900;
 }
 
@@ -802,13 +840,13 @@ body::before {
 }
 
 .char-option .char-name {
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 900;
     color: var(--text)
 }
 
 .char-option .char-class {
-    font-size: 10px;
+    font-size: var(--fs-xs);
     color: var(--secondary);
     font-weight: 800
 }
@@ -850,7 +888,7 @@ body::before {
     object-fit: contain;
 }
 
-/* v1.001 Consolidated Avatar Edit Badge */
+/* Avatar Edit Badge */
 .avatar-edit-badge {
     position: absolute;
     bottom: 5px;
@@ -876,30 +914,6 @@ body::before {
 
 .char-profile-avatar .char-big {
     font-size: 60px;
-}
-
-/* v1.001 Consolidated Avatar Edit Badge */
-.avatar-edit-badge {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 36px;
-    height: 36px;
-    background: var(--primary);
-    color: white;
-    border: 3px solid #FFFFFF;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.char-profile-avatar-container:active .avatar-edit-badge {
-    transform: scale(0.9) rotate(5deg);
 }
 
 .avatar-edit-badge i {
@@ -1005,7 +1019,7 @@ body::before {
 }
 
 .char-big {
-    font-size: 56px;
+    font-size: var(--fs-icon-lg);
     filter: drop-shadow(0 4px 16px rgba(255, 215, 0, .4));
     animation: charFloat 3s ease-in-out infinite
 }
@@ -1051,13 +1065,13 @@ body::before {
 }
 
 .char-title {
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     font-weight: 900;
     margin-top: 8px
 }
 
 .char-subtitle {
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     color: var(--secondary);
     font-weight: 800;
     margin-top: 2px
@@ -1067,10 +1081,10 @@ body::before {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 900;
     padding: 5px 12px;
-    border-radius: 100px;
+    border-radius: var(--radius-pill);
     background: linear-gradient(135deg, rgba(255, 215, 0, .2), rgba(255, 107, 0, .2));
     color: var(--primary);
     border: 1px solid rgba(255, 215, 0, .3);
@@ -1092,14 +1106,14 @@ body::before {
 }
 
 .p-stat .p-val {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     display: block;
     color: var(--primary)
 }
 
 .p-stat .p-label {
-    font-size: 9px;
+    font-size: var(--fs-xs);
     color: var(--text2);
     text-transform: uppercase;
     font-weight: 800;
@@ -1129,13 +1143,13 @@ body::before {
 }
 
 .ach-item .ach-icon {
-    font-size: 28px;
+    font-size: var(--fs-display);
     display: block;
     margin-bottom: 2px
 }
 
 .ach-item .ach-name {
-    font-size: 9px;
+    font-size: var(--fs-xs);
     font-weight: 800;
     color: var(--text2)
 }
@@ -1149,13 +1163,13 @@ body::before {
 }
 
 .section-header h2 {
-    font-size: 16px;
+    font-size: var(--fs-subtitle);
     font-weight: 900;
     letter-spacing: .5px
 }
 
 .section-header a {
-    font-size: 12px;
+    font-size: var(--fs-caption);
     color: var(--primary);
     font-weight: 900;
     text-decoration: none
@@ -1173,7 +1187,7 @@ body::before {
 }
 
 .detail-header h2 {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     margin-top: 6px;
     margin-bottom: 6px
@@ -1197,8 +1211,8 @@ body::before {
     background: var(--surface2);
     border: 1px solid var(--border);
     padding: 8px 14px;
-    border-radius: 100px;
-    font-size: 13px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-body-sm);
     font-weight: 900
 }
 
@@ -1242,7 +1256,7 @@ body::before {
 .modal-sheet {
     background: linear-gradient(180deg, #2e1a6e, #1a1040);
     border: 2px solid var(--border);
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     width: 100%;
     max-width: 430px;
     padding: 24px 24px calc(24px + var(--safe-b));
@@ -1263,14 +1277,14 @@ body::before {
 }
 
 .modal-title {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     text-align: center;
     margin-bottom: 8px
 }
 
 .modal-desc {
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     color: var(--text2);
     text-align: center;
     margin-bottom: 20px;
@@ -1290,7 +1304,7 @@ body::before {
 }
 
 .paywall-price .period {
-    font-size: 14px;
+    font-size: var(--fs-body);
     color: var(--text2);
     font-weight: 700
 }
@@ -1305,7 +1319,7 @@ body::before {
     align-items: center;
     gap: 8px;
     padding: 7px 0;
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 700
 }
 
@@ -1325,7 +1339,7 @@ body::before {
 }
 
 .auth-logo {
-    font-size: 72px;
+    font-size: var(--fs-icon-xl);
     margin-bottom: 12px;
     filter: drop-shadow(0 0 24px rgba(255, 215, 0, .4));
     animation: charFloat 3s ease-in-out infinite
@@ -1340,7 +1354,7 @@ body::before {
 .auth-subtitle {
     color: var(--text2);
     margin-bottom: 32px;
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 700
 }
 
@@ -1358,7 +1372,7 @@ body::before {
     gap: 12px;
     margin: 4px 0;
     color: var(--text3);
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 700
 }
 
@@ -1370,37 +1384,7 @@ body::before {
     background: var(--border)
 }
 
-/* TOAST */
-.toast {
-    position: fixed;
-    top: 50px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-120%);
-    background: var(--bg3);
-    border: 2px solid var(--primary);
-    color: var(--text);
-    padding: 12px 22px;
-    border-radius: var(--radius);
-    font-weight: 900;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 200;
-    transition: transform .4s cubic-bezier(.16, 1, .3, 1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, .5), 0 0 16px rgba(255, 215, 0, .15);
-    white-space: nowrap;
-    max-width: 92%
-}
-
-.toast.show {
-    transform: translateX(-50%) translateY(0)
-}
-
-.toast i {
-    font-size: 20px;
-    color: var(--primary)
-}
+/* TOAST — see consolidated definition below (TOAST CONSOLIDATED) */
 
 /* CELEBRATION STYLES CONSOLIDATED BELOW */
 
@@ -1422,11 +1406,11 @@ body::before {
     height: 44px;
     border-radius: 50%;
     background: var(--primary);
-    color: #1a1040;
+    color: var(--text-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     flex-shrink: 0;
     font-weight: 900
 }
@@ -1528,7 +1512,7 @@ body::before {
 }
 
 .record-timer {
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     font-weight: 900;
     margin-top: 8px;
     font-variant-numeric: tabular-nums;
@@ -1536,7 +1520,7 @@ body::before {
 }
 
 .record-hint {
-    font-size: 12px;
+    font-size: var(--fs-caption);
     color: var(--text2);
     margin-top: 6px;
     font-weight: 700
@@ -1553,7 +1537,7 @@ body::before {
     gap: 12px;
     padding: 14px 12px;
     border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 800;
     cursor: pointer;
     border-radius: var(--radius-sm);
@@ -1565,7 +1549,7 @@ body::before {
 }
 
 .menu-item i {
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     color: var(--text2);
     width: 28px;
     text-align: center
@@ -1577,7 +1561,7 @@ body::before {
     align-items: center;
     gap: 4px;
     color: var(--text3);
-    font-size: 12px
+    font-size: var(--fs-caption)
 }
 
 /* SUBSCRIPTION */
@@ -1592,13 +1576,13 @@ body::before {
 }
 
 .sub-card .sub-badge-big {
-    font-size: 56px;
+    font-size: var(--fs-icon-lg);
     margin-bottom: 12px;
     filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.3));
 }
 
 .sub-card h3 {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     margin-bottom: 4px;
     color: var(--text);
@@ -1611,7 +1595,7 @@ body::before {
 
 .form-group label {
     display: block;
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     color: var(--text3);
     margin-bottom: 8px;
@@ -1627,7 +1611,7 @@ select {
     color: var(--text);
     border-radius: 12px;
     padding: 14px 16px;
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     font-weight: 700;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1685,7 +1669,7 @@ select:focus {
 }
 
 .battle-label {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 900;
     color: #00E5FF;
     text-transform: uppercase;
@@ -1695,14 +1679,14 @@ select:focus {
 }
 
 .battle-monster-name {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     color: #FFFFFF;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 .battle-hint {
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     color: rgba(255, 255, 255, 0.8);
     font-weight: 700;
     margin-top: 4px;
@@ -1710,7 +1694,7 @@ select:focus {
 }
 
 .battle-monster-emoji {
-    font-size: 56px;
+    font-size: var(--fs-icon-lg);
     filter: drop-shadow(0 4px 16px rgba(0, 229, 255, 0.5));
     animation: monsterBob 2s ease-in-out infinite
 }
@@ -1772,7 +1756,7 @@ select:focus {
 
 .battle-monster-sprite,
 .battle-player-sprite {
-    font-size: 56px;
+    font-size: var(--fs-icon-lg);
     filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
     transition: transform .3s
 }
@@ -1791,7 +1775,7 @@ select:focus {
 }
 
 .battle-name {
-    font-size: 16px;
+    font-size: var(--fs-subtitle);
     font-weight: 900;
     margin-bottom: 6px;
     color: var(--text);
@@ -1818,12 +1802,12 @@ select:focus {
 }
 
 .battle-hp-fill.player-hp {
-    background: linear-gradient(90deg, #10B981, #34D399);
+    background: linear-gradient(90deg, #10B981, var(--green-light));
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }
 
 .battle-hp-text {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     color: var(--text3);
     margin-top: 6px;
@@ -1846,7 +1830,7 @@ select:focus {
     min-height: 80px;
     max-height: 140px;
     overflow-y: auto;
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 700;
     color: var(--text2);
     line-height: 1.8;
@@ -1883,7 +1867,7 @@ select:focus {
 .battle-actions .btn {
     flex: 1;
     padding: 14px 8px;
-    font-size: 13px
+    font-size: var(--fs-body-sm)
 }
 
 /* Battle FX animations */
@@ -1960,7 +1944,7 @@ select:focus {
 
 .damage-float {
     position: absolute;
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     font-weight: 900;
     color: var(--red);
     text-shadow: 0 2px 4px rgba(0, 0, 0, .5);
@@ -1975,7 +1959,7 @@ select:focus {
 
 .damage-float.crit {
     color: var(--pink);
-    font-size: 28px
+    font-size: var(--fs-display)
 }
 
 @keyframes monsterHurt {
@@ -2038,7 +2022,7 @@ select:focus {
     top: -12px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 32px;
+    font-size: var(--fs-display-lg);
     color: var(--primary);
     z-index: 10;
     filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.4));
@@ -2107,11 +2091,11 @@ select:focus {
 }
 
 .text-sm {
-    font-size: 12px
+    font-size: var(--fs-caption)
 }
 
 .text-xs {
-    font-size: 10px
+    font-size: var(--fs-xs)
 }
 
 .font-bold {
@@ -2149,7 +2133,7 @@ select:focus {
     flex: 1;
     padding: 8px 0;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 800;
     color: var(--text3);
     background: transparent;
@@ -2180,13 +2164,13 @@ select:focus {
 }
 
 .dash-stat .ds-val {
-    font-size: 28px;
+    font-size: var(--fs-display);
     font-weight: 900;
     display: block
 }
 
 .dash-stat .ds-label {
-    font-size: 10px;
+    font-size: var(--fs-xs);
     color: var(--text2);
     text-transform: uppercase;
     font-weight: 800;
@@ -2218,7 +2202,7 @@ select:focus {
 }
 
 .dash-type-icon {
-    font-size: 28px;
+    font-size: var(--fs-display);
     flex-shrink: 0
 }
 
@@ -2227,7 +2211,7 @@ select:focus {
 }
 
 .dash-type-name {
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 900;
     margin-bottom: 4px
 }
@@ -2235,18 +2219,18 @@ select:focus {
 .dash-type-bar {
     height: 8px;
     background: rgba(0, 0, 0, .3);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     overflow: hidden
 }
 
 .dash-type-bar-fill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition: width .6s ease
 }
 
 .dash-type-count {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     color: var(--text3);
     font-weight: 700;
     margin-top: 2px
@@ -2265,25 +2249,25 @@ select:focus {
     gap: 4px;
     padding: 6px 10px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     background: rgba(255, 215, 0, .1);
     border: 1px solid rgba(255, 215, 0, .2);
     color: var(--primary)
 }
 
-/* ===== TOAST (was missing — root cause of stuck toast!) ===== */
+/* ===== TOAST CONSOLIDATED ===== */
 .toast {
     position: fixed;
     top: 0;
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
-    z-index: 9999;
-    background: linear-gradient(135deg, #FFD700, #FF8C00);
-    color: #1a1040;
+    z-index: var(--z-toast);
+    background: linear-gradient(135deg, var(--orange), #FF8C00);
+    color: var(--text-dark);
     padding: 10px 24px;
-    border-radius: 0 0 16px 16px;
-    font-size: 13px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    font-size: var(--fs-body-sm);
     font-weight: 900;
     display: flex;
     align-items: center;
@@ -2304,11 +2288,15 @@ select:focus {
     pointer-events: auto
 }
 
+.toast i {
+    font-size: var(--fs-heading);
+}
+
 /* ===== CELEBRATION (was missing) ===== */
 .celebration {
     position: fixed;
     inset: 0;
-    z-index: 10000;
+    z-index: var(--z-celebration);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -2327,20 +2315,20 @@ select:focus {
 }
 
 .cel-icon {
-    font-size: 72px;
+    font-size: var(--fs-icon-xl);
     animation: celBounce .6s cubic-bezier(.34, 1.56, .64, 1)
 }
 
 .cel-title {
     font-size: 24px;
     font-weight: 900;
-    color: #FFD700;
+    color: var(--gold);
     margin-top: 12px;
     text-shadow: 0 2px 8px rgba(255, 215, 0, .5)
 }
 
 .cel-sub {
-    font-size: 14px;
+    font-size: var(--fs-body);
     color: var(--text2);
     margin-top: 8px;
     font-weight: 700
@@ -2378,13 +2366,13 @@ select:focus {
 /* Bigger XP bar for better progress visibility */
 .xp-track {
     height: 8px !important;
-    border-radius: 4px !important;
+    border-radius: var(--radius-xs) !important;
     background: rgba(255, 255, 255, .08) !important
 }
 
 .xp-fill {
     height: 8px !important;
-    border-radius: 4px !important
+    border-radius: var(--radius-xs) !important
 }
 
 /* Larger touch targets for back buttons */
@@ -2420,7 +2408,7 @@ select:focus {
     padding: 2px 8px;
     border-radius: 10px;
     background: rgba(255, 255, 255, .06);
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800
 }
 
@@ -2442,7 +2430,7 @@ select:focus {
 
 /* Reward cost badge — larger and more visible */
 .reward-cost {
-    font-size: 14px !important;
+    font-size: var(--fs-body) !important;
     font-weight: 900 !important;
     padding: 4px 10px !important;
     border-radius: 12px !important;
@@ -2469,7 +2457,7 @@ select:focus {
 
 /* Better section headers */
 .section-header h2 {
-    font-size: 15px !important
+    font-size: var(--fs-body-lg) !important
 }
 
 /* Menu item hover states */
@@ -2814,7 +2802,7 @@ select:focus {
 
 .modal-sheet {
     background: var(--bg2);
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     padding: 24px;
     padding-bottom: calc(24px + var(--safe-b));
     transform: translateY(100%);
@@ -2835,7 +2823,7 @@ select:focus {
 }
 
 .modal-title {
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     font-weight: 900;
     text-align: center;
     margin-bottom: 8px;
@@ -2845,7 +2833,7 @@ select:focus {
 .modal-desc {
     text-align: center;
     color: var(--text2);
-    font-size: 14px;
+    font-size: var(--fs-body);
     margin-bottom: 24px;
     line-height: 1.6;
 }
@@ -2859,7 +2847,7 @@ select:focus {
 }
 
 .paywall-price .price {
-    font-size: 42px;
+    font-size: var(--fs-hero);
     font-weight: 900;
     color: var(--primary);
 }
@@ -2881,7 +2869,7 @@ select:focus {
 
 .paywall-features li {
     margin-bottom: 12px;
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -2895,7 +2883,7 @@ select:focus {
 
 .paywall-features li i {
     color: var(--primary);
-    font-size: 20px;
+    font-size: var(--fs-heading);
 }
 
 /* Character Humorous Dialogue Bubble */
@@ -2911,7 +2899,7 @@ select:focus {
     border-radius: 16px;
     border-top-left-radius: 4px;
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 800;
     line-height: 1.5;
     color: var(--text);
@@ -2955,7 +2943,7 @@ select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--fs-display);
     border-radius: 14px;
     border: 2px solid var(--border);
     background: var(--bg);
@@ -3008,7 +2996,7 @@ select:focus {
 }
 
 .guild-name-big {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 900;
     color: var(--text);
     margin-bottom: 4px;
@@ -3023,7 +3011,7 @@ select:focus {
     background: var(--bg);
     border: 1px solid var(--border);
     font-family: monospace;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 900;
     letter-spacing: 3px;
     color: var(--primary);
@@ -3051,7 +3039,7 @@ select:focus {
     border-radius: 14px;
     background: var(--surface);
     border: 1px solid var(--border);
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     color: var(--text2);
 }
@@ -3081,7 +3069,7 @@ select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     flex-shrink: 0;
 }
 
@@ -3091,13 +3079,13 @@ select:focus {
 }
 
 .guild-member-name {
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 800;
     color: var(--text);
 }
 
 .guild-member-role {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     color: var(--text3);
     display: flex;
@@ -3111,7 +3099,7 @@ select:focus {
     gap: 3px;
     padding: 2px 8px;
     border-radius: 8px;
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 900;
 }
 
@@ -3140,7 +3128,7 @@ select:focus {
     gap: 6px;
     padding: 10px 16px;
     border-radius: var(--radius-sm);
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     font-weight: 800;
     cursor: pointer;
     border: 1px solid var(--border);
@@ -3335,12 +3323,12 @@ select:focus {
 }
 
 .auth-logo-icon {
-    font-size: 42px;
+    font-size: var(--fs-hero);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .auth-brand-title {
-    font-size: 42px;
+    font-size: var(--fs-hero);
     font-weight: 900;
     color: #fff;
     letter-spacing: 6px;
@@ -3350,7 +3338,7 @@ select:focus {
 }
 
 .auth-brand-sub {
-    font-size: 20px;
+    font-size: var(--fs-heading);
     font-weight: 800;
     color: rgba(255, 255, 255, 0.7);
     letter-spacing: 4px;
@@ -3367,12 +3355,12 @@ select:focus {
 
 .auth-tagline-line {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 16px;
+    font-size: var(--fs-subtitle);
     font-weight: 700;
 }
 
 .auth-tagline-highlight {
-    font-size: 28px;
+    font-size: var(--fs-display);
     font-weight: 900;
     background: linear-gradient(90deg, #fbbf24, #f472b6, #818cf8, #fbbf24);
     background-size: 300% 100%;
@@ -3394,7 +3382,7 @@ select:focus {
 
 .auth-tagline-desc {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 700;
     letter-spacing: 2px;
     margin-top: 8px;
@@ -3429,7 +3417,7 @@ select:focus {
 
 .auth-form-inner .form-group label {
     color: rgba(255, 255, 255, 0.75);
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
 }
 
@@ -3439,7 +3427,7 @@ select:focus {
     color: #fff;
     border-radius: var(--radius-sm);
     padding: 12px 14px;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 700;
     font-family: inherit;
     width: 100%;
@@ -3461,7 +3449,7 @@ select:focus {
 .auth-login-btn {
     margin-top: 8px;
     padding: 14px;
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     border-radius: 14px;
     letter-spacing: 1px;
 }
@@ -3469,7 +3457,7 @@ select:focus {
 .auth-divider {
     text-align: center;
     color: rgba(255, 255, 255, 0.4);
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 800;
     margin: 16px 0;
     position: relative;
@@ -3502,7 +3490,7 @@ select:focus {
     justify-content: center;
     gap: 10px;
     padding: 13px;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 800;
     border-radius: 14px;
 }
@@ -3516,7 +3504,7 @@ select:focus {
     z-index: 1;
     margin-top: 20px;
     color: rgba(255, 255, 255, 0.35);
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 700;
     text-align: center;
     animation: authFormSlideUp 0.8s ease-out 0.6s both;
@@ -3543,14 +3531,14 @@ select:focus {
 }
 
 .auth-step2-title {
-    font-size: 22px;
+    font-size: var(--fs-display-sm);
     font-weight: 900;
     color: var(--text);
     margin-bottom: 4px;
 }
 
 .auth-step2-subtitle {
-    font-size: 13px;
+    font-size: var(--fs-body-sm);
     color: var(--text2);
     font-weight: 700;
 }
@@ -3605,7 +3593,7 @@ select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--fs-display);
     flex-shrink: 0;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
 }
@@ -3616,14 +3604,14 @@ select:focus {
 }
 
 .profile-guild-name {
-    font-size: 15px;
+    font-size: var(--fs-body-lg);
     font-weight: 900;
     color: var(--text);
     margin-bottom: 2px;
 }
 
 .profile-guild-desc {
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 700;
     color: var(--text2);
 }
@@ -3637,7 +3625,7 @@ select:focus {
     border-radius: 20px;
     background: rgba(99, 102, 241, 0.08);
     border: 1px solid rgba(99, 102, 241, 0.15);
-    font-size: 11px;
+    font-size: var(--fs-sm);
     font-weight: 800;
     color: var(--primary);
     margin-top: 4px;
@@ -3659,14 +3647,14 @@ select:focus {
 }
 
 .no-guild-banner .no-guild-title {
-    font-size: 16px;
+    font-size: var(--fs-subtitle);
     font-weight: 900;
     color: var(--text);
     margin-bottom: 4px;
 }
 
 .no-guild-banner .no-guild-desc {
-    font-size: 12px;
+    font-size: var(--fs-caption);
     font-weight: 700;
     color: var(--text2);
     line-height: 1.6;
@@ -3684,7 +3672,7 @@ select:focus {
     position: fixed;
     bottom: 85px;
     right: 15px;
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 900;
     color: var(--text3);
     opacity: 0.4;
