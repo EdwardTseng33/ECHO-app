@@ -8,13 +8,13 @@
  */
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDEMO_REPLACE_WITH_YOUR_KEY",
-    authDomain: "echo-app-prod.firebaseapp.com",
-    projectId: "echo-app-prod",
-    storageBucket: "echo-app-prod.firebasestorage.app",
-    messagingSenderId: "000000000000",
-    appId: "1:000000000000:web:0000000000000000000000",
-    measurementId: "G-XXXXXXXXXX"
+    apiKey: "AIzaSyCY8sF0PZc_BGhp3sgZpx64tZnDyBwa6Tg",
+    authDomain: "beyond-business-ca9da.firebaseapp.com",
+    projectId: "beyond-business-ca9da",
+    storageBucket: "beyond-business-ca9da.firebasestorage.app",
+    messagingSenderId: "233160072382",
+    appId: "1:233160072382:web:a8f3d66bc77322add912ef",
+    measurementId: "G-9EH6WXYMQD"
 };
 
 // Initialize Firebase
