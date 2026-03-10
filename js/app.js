@@ -293,7 +293,7 @@ function getPlayerStats(acc) {
 }
 
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // 1. Initialize Firebase (if configured)
     const fbReady = (typeof initFirebase === 'function') ? initFirebase() : false;
     const fbConfigured = (typeof isFirebaseConfigured === 'function') ? isFirebaseConfigured() : false;
@@ -308,21 +308,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Initialize Auth module
-    if (typeof EchoAuth !== 'undefined') {
-        EchoAuth.init();
-    }
-
-    // 3. Initialize Firestore
+    // 2. Initialize Firestore
     if (typeof EchoDb !== 'undefined') {
         EchoDb.init();
+    }
+
+    // 3. Initialize Auth module (waits for first auth state check)
+    let firebaseUser = null;
+    if (typeof EchoAuth !== 'undefined') {
+        // init() 返回 Promise，等待 Firebase Auth 確認使用者狀態
+        // 如果 Firebase 已登入，會自動 enterApp() 或導向 step2
+        firebaseUser = await EchoAuth.init();
     }
 
     // 4. Initialize Payment (PAYUNi / Demo)
     if (typeof EchoPayment !== 'undefined') {
         EchoPayment.init();
         EchoPayment.handlePaymentCallback();
-        // 檢查 PRO 是否到期
         const uid = (typeof EchoAuth !== 'undefined' && EchoAuth.getUid) ? EchoAuth.getUid() : null;
         if (uid) EchoPayment.checkExpiry(uid);
     }
@@ -337,8 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (r.stock === undefined) r.stock = 5;
     });
 
-    // 7. Check existing session
-    if (globalData.activeId && me()) {
+    // 7. Check existing session (only if Firebase didn't already handle it)
+    if (!firebaseUser && globalData.activeId && me()) {
         const a = me();
         if (!a.name || a.name === '冒險者') {
             showScreen('screen-auth-step2');
@@ -395,7 +397,7 @@ async function doLoginStep1() {
     }
 }
 
-function completeRegistration() {
+async function completeRegistration() {
     const name = document.getElementById('auth-name').value.trim();
     const age = parseInt(document.getElementById('auth-age').value) || 0;
     const loc = document.getElementById('auth-loc').value.trim();
@@ -415,6 +417,21 @@ function completeRegistration() {
     }
 
     saveGlobal();
+
+    // 同步到 Firestore（若已連線）
+    const uid = (typeof EchoAuth !== 'undefined') ? EchoAuth.getUid() : null;
+    if (uid && typeof EchoDb !== 'undefined' && EchoDb.isReady()) {
+        await EchoDb.saveUserData(uid);
+        console.log('[ECHO] 冒險者資料已同步到雲端');
+    }
+
+    // 更新 Firebase displayName（若使用 Firebase Auth）
+    if (typeof EchoAuth !== 'undefined' && EchoAuth.currentUser) {
+        try {
+            await EchoAuth.currentUser.updateProfile({ displayName: name });
+        } catch (e) { console.warn('[ECHO] 更新 displayName 失敗:', e); }
+    }
+
     const className = getClassName(a.level, a);
     showCelebration('📸', `歡迎 ${className} ${name}！`, '冒險即將開始…');
     setTimeout(() => enterApp(), 2500);

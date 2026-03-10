@@ -12,25 +12,56 @@ const EchoAuth = {
 
     /**
      * 初始化 Auth 監聽器
+     * 返回 Promise：首次 auth state 確認後 resolve
      */
     init() {
         if (!firebaseAuth) {
             console.warn('[EchoAuth] Firebase Auth not available, falling back to local mode');
-            return;
+            this._authChecked = true;
+            return Promise.resolve(null);
         }
 
-        firebaseAuth.onAuthStateChanged(async (user) => {
-            this.currentUser = user;
-            if (user) {
-                console.log('[EchoAuth] 使用者已登入:', user.email);
-                await this._handleAuthSuccess(user);
-            } else {
-                console.log('[EchoAuth] 使用者未登入');
+        // 處理 Google Redirect 回調（手機 PWA 場景）
+        try {
+            const redirectResult = await firebaseAuth.getRedirectResult();
+            if (redirectResult && redirectResult.user) {
+                console.log('[EchoAuth] Redirect 登入成功:', redirectResult.user.email);
             }
-            if (this._onAuthReady) {
-                this._onAuthReady(user);
-                this._onAuthReady = null;
+        } catch (e) {
+            if (e.code !== 'auth/no-auth-event') {
+                console.warn('[EchoAuth] Redirect result error:', e.code);
             }
+        }
+
+        return new Promise((resolve) => {
+            let firstCheck = true;
+            firebaseAuth.onAuthStateChanged(async (user) => {
+                this.currentUser = user;
+                if (user) {
+                    console.log('[EchoAuth] 使用者已登入:', user.email);
+                    await this._handleAuthSuccess(user);
+                    // 自動導入 app（如果還在 auth 畫面）
+                    if (firstCheck) {
+                        const a = me();
+                        if (a && a.name && a.name !== '冒險者') {
+                            enterApp();
+                        } else {
+                            showScreen('screen-auth-step2');
+                        }
+                    }
+                } else {
+                    console.log('[EchoAuth] 使用者未登入');
+                }
+                this._authChecked = true;
+                if (firstCheck) {
+                    firstCheck = false;
+                    resolve(user);
+                }
+                if (this._onAuthReady) {
+                    this._onAuthReady(user);
+                    this._onAuthReady = null;
+                }
+            });
         });
     },
 
@@ -78,7 +109,22 @@ const EchoAuth = {
             provider.addScope('profile');
             provider.setCustomParameters({ prompt: 'select_account' });
 
-            const result = await firebaseAuth.signInWithPopup(provider);
+            let result;
+            try {
+                // 優先使用 Popup（桌面瀏覽器）
+                result = await firebaseAuth.signInWithPopup(provider);
+            } catch (popupErr) {
+                // Popup 被阻擋（常見於手機 PWA）→ 改用 Redirect
+                if (popupErr.code === 'auth/popup-blocked' ||
+                    popupErr.code === 'auth/cancelled-popup-request' ||
+                    popupErr.code === 'auth/operation-not-supported-in-this-environment') {
+                    console.log('[EchoAuth] Popup 不支援，改用 Redirect');
+                    await firebaseAuth.signInWithRedirect(provider);
+                    return { success: true, pending: true };
+                }
+                throw popupErr;
+            }
+
             const isNew = result.additionalUserInfo?.isNewUser || false;
 
             if (isNew) {
