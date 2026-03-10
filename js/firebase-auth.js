@@ -173,8 +173,10 @@ const EchoAuth = {
         if (!globalData.accounts[uid]) {
             globalData.accounts[uid] = defaultAccount(user.displayName || '冒險者');
             globalData.accounts[uid].email = user.email;
+            // 不自動使用 Google 照片 — 統一使用角色預設頭像
+            // Google photoURL 保留備用但不覆蓋角色頭像
             if (user.photoURL) {
-                globalData.accounts[uid].avatarUrl = user.photoURL;
+                globalData.accounts[uid].googlePhotoUrl = user.photoURL;
             }
         }
 

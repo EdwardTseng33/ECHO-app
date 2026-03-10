@@ -204,11 +204,7 @@ function defaultGlobal() {
         tasks: [],       // shared task pool
         rewards: [...DEFAULT_REWARDS],
         echoes: {},
-        familyMembers: [
-            { id: 'mom', name: '媽媽', role: 'parent' },
-            { id: 'dad', name: '爸爸', role: 'parent' },
-            { id: 'child1', name: '小明', role: 'child' },
-        ],
+        familyMembers: [],
     };
 }
 function defaultAccount(name) {
@@ -298,15 +294,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fbReady = (typeof initFirebase === 'function') ? initFirebase() : false;
     const fbConfigured = (typeof isFirebaseConfigured === 'function') ? isFirebaseConfigured() : false;
 
-    // Show Firebase status indicator
-    const statusEl = document.getElementById('firebase-status');
-    if (statusEl) {
-        if (fbReady && fbConfigured) {
-            statusEl.innerHTML = '<span style="color:#10B981;">● 雲端模式</span>';
-        } else {
-            statusEl.innerHTML = '<span style="color:#F59E0B;">● 本地模式（Demo）</span>';
-        }
-    }
+    // Firebase status: log only, no UI indicator
+    console.log(`[ECHO] Firebase: ${fbReady && fbConfigured ? '雲端模式' : '本地模式'}`);
 
     // 2. Initialize Firestore
     if (typeof EchoDb !== 'undefined') {
@@ -329,10 +318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (uid) EchoPayment.checkExpiry(uid);
     }
 
-    // 5. Force restore demo tasks if empty or too few for a good demo
-    if (globalData.tasks.length < 3) {
-        seedDemoTasks();
-    }
+    // 5. No demo data — real users start with a clean slate
 
     // 6. Data Migration: ensure rewards have stock
     globalData.rewards.forEach(r => {
