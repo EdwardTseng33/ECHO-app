@@ -967,7 +967,7 @@ function refreshProfile() {
 
     // Show pet icons overlay if any
     if (stats.pets && stats.pets.length > 0) {
-        const petsHtml = stats.pets.map((p, i) => `<div style="position:absolute; bottom:${-10 + i * 15}px; right:${-10 - i * 5}px; font-size:24px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); animation: charFloat ${2 + i * 0.5}s ease-in-out infinite;">${p.emoji}</div>`).join('');
+        const petsHtml = stats.pets.map((p, i) => `<div class="char-pet-overlay" style="bottom:${-10 + i * 15}px; right:${-10 - i * 5}px;">${p.emoji}</div>`).join('');
         bigEl.innerHTML += petsHtml;
     }
 
@@ -981,7 +981,7 @@ function refreshProfile() {
     document.getElementById('prof-name').textContent = a.name;
     const cn = getClassName(a.level, a);
     document.getElementById('prof-classname').textContent = cn;
-    document.getElementById('prof-class-badge').innerHTML = `⭐ Lv.${a.level} ${cn}`;
+    document.getElementById('prof-class-badge').textContent = cn;
     document.getElementById('prof-class-badge').style.color = ringColor;
     document.getElementById('p-level').textContent = a.level;
     document.getElementById('p-xp').textContent = a.totalXP;
@@ -1316,7 +1316,7 @@ function renderMyTasks() {
                 <div class="progress-stat-label">已完成</div>
               </div>
               <div class="progress-stat">
-                <div class="progress-stat-value">${a.streakCount || 0}<span style="font-size:16px;">🔥</span></div>
+                <div class="progress-stat-value">${a.streakCount || 0}<span class="streak-fire">🔥</span></div>
                 <div class="progress-stat-label">連續天數</div>
               </div>
             </div>

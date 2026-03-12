@@ -1099,6 +1099,12 @@ body::before {
     animation: none;
 }
 
+.char-pet-overlay {
+    position: absolute;
+    font-size: 24px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
 .char-profile-avatar .char-big img {
     width: 100%;
     height: 100%;
@@ -2938,9 +2944,9 @@ select:focus {
     }
 }
 
-/* Better section headers */
+/* Section header h2 sizing */
 .section-header h2 {
-    font-size: var(--fs-body-lg) !important
+    font-size: var(--fs-body-lg);
 }
 
 /* Menu item hover states */
@@ -4152,21 +4158,13 @@ select:focus {
 .u-fw800 { font-weight: 800; }
 .u-fw900 { font-weight: 900; }
 
-/* Section Header (repeated inline pattern) */
-.section-header {
-    font-size: var(--fs-body);
-    font-weight: 900;
-    color: var(--text);
-    margin-bottom: 12px;
-    padding-left: 4px;
-}
-
+/* section-header-sm: standalone label style (not the flex header) */
 .section-header-sm {
     font-size: var(--fs-body-sm);
     font-weight: 900;
     color: var(--text2);
     margin-bottom: 12px;
-    padding-left: 4px;
+    padding-left: 20px;
 }
 
 .section-label {
@@ -4245,7 +4243,7 @@ select:focus-visible {
 
 /* Summary Card */
 .progress-summary-card {
-    margin: 0 16px 8px;
+    margin: 0 20px 8px;
     padding: 20px;
     background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%);
     border-radius: var(--radius-lg);
@@ -4291,6 +4289,10 @@ select:focus-visible {
     opacity: 0.85;
     font-weight: 600;
     letter-spacing: 0.5px;
+}
+
+.streak-fire {
+    font-size: 16px;
 }
 
 .progress-xp-bar {
