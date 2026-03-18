@@ -74,6 +74,11 @@
     -webkit-tap-highlight-color: transparent
 }
 
+/* Global utility: hide element (exclude .screen which uses transform) */
+.hidden:not(.screen) {
+    display: none !important;
+}
+
 html,
 body {
     height: 100%;
