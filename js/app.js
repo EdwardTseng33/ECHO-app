@@ -1066,7 +1066,7 @@ function refreshProfile() {
     const bigEl = document.getElementById('prof-char');
     const bubbleEl = document.getElementById('prof-char-bubble');
     if (bigEl) {
-        bigEl.innerHTML = getCharImg(a, 80, a.level, false);
+        bigEl.innerHTML = getCharImg(a, 120, a.level, false);
         bigEl.className = 'char-big';
         bigEl.style.cursor = 'pointer';
         bigEl.onclick = () => {
