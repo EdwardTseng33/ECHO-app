@@ -1005,15 +1005,12 @@ function refreshHUD() {
         const status = EchoStreak.checkStreakStatus(a);
         const count = status.streakCount || 0;
         if (count > 0) {
-            const fireColor = count >= 30 ? '#FFD700' : count >= 7 ? '#FF6B00' : '#FF4757';
-            streakInline.innerHTML = `<span style="color:${fireColor}">🔥 ${count}天</span>`;
-            streakInline.style.background = `rgba(255,107,0,0.1)`;
-            streakInline.style.padding = '2px 10px';
-            streakInline.style.borderRadius = '20px';
+            const tierClass = count >= 30 ? 'streak-gold' : count >= 7 ? 'streak-hot' : 'streak-warm';
+            streakInline.innerHTML = `<span class="${tierClass}">🔥 ${count}天</span>`;
+            streakInline.classList.add('streak-active');
         } else {
             streakInline.innerHTML = '';
-            streakInline.style.background = 'none';
-            streakInline.style.padding = '0';
+            streakInline.classList.remove('streak-active');
         }
     }
 
@@ -1383,12 +1380,12 @@ function taskCardHTML(t) {
     <div class="task-meta-flex">
       ${locStr}${dlStr}${checkStr}
     </div>
-    <div style="width:100%; height:1px; background:var(--border); margin: 12px 0;"></div>
-    <div class="task-meta" style="margin-top:0">
+    <div class="task-card-divider"></div>
+    <div class="task-meta task-meta-bottom">
       <span class="task-publisher"><i class="ph-fill ph-user-circle"></i> ${esc(t.creator)} 發布</span>
-       <div style="display:flex; gap:8px;">
-          <span style="font-weight:900; color:#F59E0B; font-family:monospace; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); padding:4px 10px; border-radius:12px; display:flex; align-items:center; gap:4px;"><i class="ph-bold ph-lightning" style="font-size:14px;"></i> ${XP_TABLE[t.difficulty] || 50} XP</span>
-          <span style="font-weight:900; color:var(--primary); font-family:monospace; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); padding:4px 10px; border-radius:12px; display:flex; align-items:center; gap:4px;"><i class="ph-bold ph-coin" style="font-size:14px;"></i> ${Math.round((XP_TABLE[t.difficulty] || 50) * PTS_RATIO)}</span>
+      <div class="task-rewards">
+          <span class="task-reward-xp"><i class="ph-bold ph-lightning"></i> ${XP_TABLE[t.difficulty] || 50} XP</span>
+          <span class="task-reward-coin"><i class="ph-bold ph-coin"></i> ${Math.round((XP_TABLE[t.difficulty] || 50) * PTS_RATIO)}</span>
       </div>
     </div>
   </div>`;
