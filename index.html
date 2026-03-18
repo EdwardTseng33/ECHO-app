@@ -407,11 +407,6 @@
 
         <!-- ===== MY TASKS / PROGRESS ===== -->
         <div class="screen hidden" id="screen-mytasks">
-            <div class="topbar">
-                <h1><i class="ph-bold ph-scroll"></i> 冒險進度</h1>
-                <div></div>
-            </div>
-
             <!-- Progress Summary Card -->
             <div class="section-pad" id="progress-summary"></div>
 
@@ -589,10 +584,6 @@
 
         <!-- ===== REWARDS ===== -->
         <div class="screen hidden" id="screen-rewards">
-            <div class="topbar">
-                <h1>王國祕寶閣</h1>
-                <div></div>
-            </div>
 
             <div class="section-pad" style="padding-bottom:0;">
                 <div class="rewards-hero-card">
@@ -651,13 +642,6 @@
 
         <!-- ===== CHARACTER PROFILE ===== -->
         <div class="screen hidden" id="screen-character">
-            <div class="topbar">
-                <h1>冒險者檔案</h1>
-                <div class="topbar-right">
-                    <button class="icon-btn" onclick="doLogout()" title="登出"><i
-                            class="ph-bold ph-sign-out"></i></button>
-                </div>
-            </div>
             <div class="char-profile">
                 <div class="char-profile-avatar-container"
                     onclick="document.getElementById('avatar-input-profile').click()">
@@ -806,6 +790,11 @@
                     <input type="text" id="redeem-code-input" class="redeem-input" placeholder="輸入兌換碼...">
                     <button class="btn btn-primary redeem-btn" onclick="processRedeemCode()">兌換</button>
                 </div>
+
+                <!-- Logout -->
+                <button class="btn-logout" onclick="doLogout()">
+                    <i class="ph-bold ph-sign-out"></i> 登出冒險契約
+                </button>
 
                 <!-- Footer Links & App Info -->
                 <div class="app-footer">
