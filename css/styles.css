@@ -580,106 +580,196 @@ body::before {
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-/* ===== HOME: Compact HUD Bar ===== */
-.home-hud-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    padding-top: calc(12px + env(safe-area-inset-top, 0px));
-    background: var(--card);
+/* ===== HOME: Character Hero Card (V1.09) ===== */
+.home-hero-card {
+    position: relative;
+    padding: 20px;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.06) 50%, rgba(236,72,153,0.04) 100%);
     border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+    min-height: 25vh;
+    max-height: 30vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+}
+.home-hero-card:active {
+    background: linear-gradient(135deg, rgba(99,102,241,0.14) 0%, rgba(168,85,247,0.10) 50%, rgba(236,72,153,0.08) 100%);
 }
 
-.home-hud-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
+.home-hero-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.home-hero-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.home-hero-avatar-ring {
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--primary);
+    padding: 3px;
+    background: conic-gradient(from 0deg, var(--primary), #a855f7, #ec4899, var(--primary));
+    animation: hero-ring-spin 4s linear infinite;
+    box-shadow: 0 0 20px rgba(99,102,241,0.25), 0 0 40px rgba(168,85,247,0.1);
+}
+@keyframes hero-ring-spin {
+    to { background: conic-gradient(from 360deg, var(--primary), #a855f7, #ec4899, var(--primary)); }
+}
+
+.home-hero-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--card);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    font-size: 20px;
+    font-size: 36px;
 }
-
-.home-hud-avatar img {
+.home-hero-avatar img {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
-.home-hud-info {
+.home-hero-info {
     flex: 1;
     min-width: 0;
 }
 
-.home-hud-name {
-    font-size: var(--fs-body);
-    font-weight: 800;
+.home-hero-name {
+    font-size: 20px;
+    font-weight: 900;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.home-hero-class {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.home-hud-xp-row {
+.home-hero-meta {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 3px;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
 }
 
-.home-hud-level {
-    font-size: var(--fs-xs);
+.home-hero-level {
+    font-size: 11px;
     font-weight: 800;
     color: #fff;
     background: var(--primary);
-    padding: 1px 8px;
+    padding: 2px 10px;
     border-radius: var(--radius-pill);
-    white-space: nowrap;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 3px;
 }
 
-.home-hud-xp-track {
+.home-hero-coins {
+    font-size: 11px;
+    font-weight: 800;
+    color: #FFD700;
+    background: rgba(255,215,0,0.12);
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.home-hero-streak {
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Hero Bars */
+.home-hero-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.home-hero-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-hero-bar-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text2);
+    width: 36px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.home-hero-bar-track {
     flex: 1;
-    height: 6px;
-    background: rgba(0,0,0,0.06);
+    height: 8px;
+    background: rgba(0,0,0,0.08);
     border-radius: var(--radius-pill);
     overflow: hidden;
 }
 
-.home-hud-xp-fill {
+.home-hero-bar-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--primary), #a855f7);
     border-radius: var(--radius-pill);
-    transition: width 0.5s ease;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.home-hud-xp-text {
-    font-size: var(--fs-xs);
+.home-hero-bar-xp {
+    background: linear-gradient(90deg, var(--primary), #a855f7);
+}
+
+.home-hero-bar-hp {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.home-hero-bar-text {
+    font-size: 10px;
     font-weight: 700;
     color: var(--text3);
+    width: 62px;
+    text-align: right;
     white-space: nowrap;
     font-family: monospace;
 }
 
-.home-hud-coins {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: var(--fs-body-sm);
-    font-weight: 800;
-    color: var(--primary);
-    background: rgba(99,102,241,0.08);
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    white-space: nowrap;
+.home-hero-tap-hint {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    opacity: 0.4;
+    font-size: 18px;
 }
 
 /* ===== HOME: Quick Actions Row ===== */
@@ -4413,4 +4503,191 @@ select:focus-visible {
     font-size: var(--fs-body);
     font-weight: 700;
     cursor: pointer;
+}
+
+/* ===== V1.09: Job Change Ceremony ===== */
+#job-ceremony {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.jc-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    transition: background 0.8s ease;
+}
+#job-ceremony.jc-active .jc-backdrop {
+    background: rgba(0,0,0,0.92);
+}
+#job-ceremony.jc-closing .jc-backdrop {
+    background: rgba(0,0,0,0);
+    transition: background 0.4s ease;
+}
+
+.jc-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+}
+#job-ceremony.jc-active .jc-content {
+    opacity: 1;
+    transform: scale(1);
+}
+#job-ceremony.jc-closing .jc-content {
+    opacity: 0;
+    transform: scale(1.1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.jc-particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.jc-particle {
+    position: absolute;
+    bottom: -20px;
+    font-size: 20px;
+    opacity: 0;
+    animation: jc-float-up 4s ease-out forwards;
+}
+@keyframes jc-float-up {
+    0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-100vh) rotate(360deg); }
+}
+
+.jc-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.jc-old-avatar {
+    opacity: 1;
+    transition: opacity 0.6s ease 0.8s, transform 0.6s ease 0.8s, filter 0.6s ease 0.8s;
+}
+#job-ceremony.jc-active .jc-old-avatar {
+    opacity: 0;
+    transform: scale(0.5);
+    filter: blur(8px);
+}
+
+.jc-text-whisper {
+    font-size: 18px;
+    font-weight: 900;
+    color: #a855f7;
+    letter-spacing: 8px;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.6s;
+    text-shadow: 0 0 20px rgba(168,85,247,0.6);
+}
+#job-ceremony.jc-active .jc-text-whisper {
+    opacity: 1;
+}
+
+.jc-flash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2;
+    animation: none;
+}
+#job-ceremony.jc-active .jc-flash {
+    animation: jc-flash-anim 0.4s ease 1.5s forwards;
+}
+@keyframes jc-flash-anim {
+    0% { opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0; }
+}
+
+.jc-new-avatar {
+    opacity: 0;
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 30px rgba(99,102,241,0.6));
+    transition: opacity 0.5s ease 1.8s, transform 0.5s ease 1.8s;
+}
+#job-ceremony.jc-active .jc-new-avatar {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.jc-title-reveal {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease 2.2s, transform 0.5s ease 2.2s;
+}
+#job-ceremony.jc-active .jc-title-reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+.jc-old-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text3);
+    text-decoration: line-through;
+}
+.jc-arrow {
+    font-size: 20px;
+    color: #FFD700;
+    font-weight: 900;
+}
+.jc-new-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.4);
+}
+
+.jc-celebration {
+    font-size: 24px;
+    font-weight: 900;
+    color: #fff;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.4s ease 2.6s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 2.6s;
+}
+#job-ceremony.jc-active .jc-celebration {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.jc-continue {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease 3s, transform 0.4s ease 3s;
+    padding: 14px 40px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+}
+#job-ceremony.jc-active .jc-continue {
+    opacity: 1;
+    transform: translateY(0);
+}
+.jc-continue:active {
+    transform: scale(0.95);
 }

@@ -260,6 +260,8 @@ function simpleHash(str) {
 // Active account helper
 function me() { return globalData.accounts[globalData.activeId] || null; }
 function myId() { return globalData.activeId; }
+// V1.09: Character abstraction layer — currently alias to me(), future: me().character
+function myChar() { return me(); }
 
 function getPlayerStats(acc) {
     if (!acc) return { atk: 0, def: 0, pets: [] };
@@ -550,7 +552,7 @@ function openCharPresetPicker() {
     let html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 0;">';
     CHAR_PRESETS.forEach(c => {
         const sel = c.id === current;
-        html += `<div onclick="applyCharPreset('${c.id}')" style="cursor:pointer;text-align:center;padding:10px 4px;border-radius:16px;border:3px solid ${sel ? 'var(--primary)' : 'transparent'};background:${sel ? 'rgba(99,102,241,0.08)' : 'var(--surface)'};transition:all 0.2s;">
+        html += `<div onclick="selectJobChange('${c.id}')" style="cursor:pointer;text-align:center;padding:10px 4px;border-radius:16px;border:3px solid ${sel ? 'var(--primary)' : 'transparent'};background:${sel ? 'rgba(99,102,241,0.08)' : 'var(--surface)'};transition:all 0.2s;">
             <img src="${c.img}" style="width:52px;height:52px;object-fit:contain;border-radius:50%;${sel ? 'filter:drop-shadow(0 0 8px rgba(99,102,241,0.5))' : ''}">
             <div style="font-size:11px;font-weight:800;color:${sel ? 'var(--primary)' : 'var(--text2)'};margin-top:4px;">${c.name}</div>
         </div>`;
@@ -567,20 +569,91 @@ function openCharPresetPicker() {
     document.body.appendChild(overlay);
 }
 
-function applyCharPreset(id) {
+// V1.09: Job Change with ceremony animation
+function selectJobChange(id) {
     const a = me(); if (!a) return;
-    const preset = CHAR_PRESETS.find(c => c.id === id);
-    if (!preset) return;
+    const oldPreset = CHAR_PRESETS.find(c => c.id === (a.charPreset || 'mage'));
+    const newPreset = CHAR_PRESETS.find(c => c.id === id);
+    if (!newPreset) return;
+
+    // If same preset, just close
+    if (id === (a.charPreset || 'mage')) {
+        const overlay = document.getElementById('char-preset-overlay');
+        if (overlay) overlay.remove();
+        return;
+    }
+
+    // Close picker
+    const picker = document.getElementById('char-preset-overlay');
+    if (picker) picker.remove();
+
+    // Apply data immediately
     a.charPreset = id;
-    a.avatarUrl = preset.img;
+    a.avatarUrl = newPreset.img;
     saveGlobal();
+
+    const oldTitle = oldPreset ? getClassName(a.level, { ...a, charPreset: oldPreset.id }) : '冒險者';
+    const newTitle = getClassName(a.level, a);
+
+    // === Full-screen Ceremony Overlay ===
+    const ceremony = document.createElement('div');
+    ceremony.id = 'job-ceremony';
+    ceremony.innerHTML = `
+        <div class="jc-backdrop"></div>
+        <div class="jc-content">
+            <div class="jc-particles" id="jc-particles"></div>
+            <div class="jc-stage">
+                <div class="jc-old-avatar jc-avatar-anim">
+                    <img src="${oldPreset ? oldPreset.img : newPreset.img}" style="width:100px;height:100px;object-fit:contain;">
+                </div>
+                <div class="jc-text-whisper">覺醒吧……</div>
+                <div class="jc-flash"></div>
+                <div class="jc-new-avatar jc-avatar-anim">
+                    <img src="${newPreset.img}" style="width:120px;height:120px;object-fit:contain;">
+                </div>
+                <div class="jc-title-reveal">
+                    <div class="jc-old-title">${oldTitle}</div>
+                    <div class="jc-arrow">→</div>
+                    <div class="jc-new-title">${newTitle}</div>
+                </div>
+                <div class="jc-celebration">✨ 轉職成功！✨</div>
+            </div>
+            <button class="jc-continue" onclick="closeJobCeremony()">繼續冒險</button>
+        </div>
+    `;
+    document.body.appendChild(ceremony);
+
+    // Generate particles
+    const particlesEl = document.getElementById('jc-particles');
+    for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'jc-particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 2 + 's';
+        p.style.animationDuration = (2 + Math.random() * 3) + 's';
+        p.textContent = ['✨', '⭐', '💫', '🌟', '🔮'][Math.floor(Math.random() * 5)];
+        particlesEl.appendChild(p);
+    }
+
+    // Play levelUp sound
+    SoundManager.play('levelUp');
+
+    // Trigger animation sequence via CSS
+    requestAnimationFrame(() => ceremony.classList.add('jc-active'));
+}
+
+function closeJobCeremony() {
+    const el = document.getElementById('job-ceremony');
+    if (el) {
+        el.classList.add('jc-closing');
+        setTimeout(() => el.remove(), 400);
+    }
     refreshProfile();
     refreshHUD();
-    const overlay = document.getElementById('char-preset-overlay');
-    if (overlay) overlay.remove();
-    const fullTitle = getClassName(a.level, a);
-    showToast(`✨ 角色已轉職為「${fullTitle}」！`);
 }
+
+// Legacy alias
+function applyCharPreset(id) { selectJobChange(id); }
 
 async function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
@@ -887,14 +960,26 @@ function refreshAll() { refreshHUD(); renderTaskFeed(); checkAchievements(); }
 function refreshHome() { refreshHUD(); renderTaskFeed(); }
 
 function refreshHUD() {
-    const a = me(); if (!a) return;
+    const a = myChar(); if (!a) return;
     const stats = getPlayerStats(a);
 
+    // V1.09: Hero Card — large avatar (72px)
     const elIcon = document.getElementById('hud-char-icon');
-    if (elIcon) elIcon.innerHTML = getCharImg(a, 40, a.level, false);
+    if (elIcon) elIcon.innerHTML = getCharImg(a, 64, a.level, false);
+
+    // Avatar ring color based on class tier
+    const ringEl = document.getElementById('hud-avatar-ring');
+    if (ringEl) {
+        const ringColor = getClassColor(a.level);
+        ringEl.style.background = `conic-gradient(from 0deg, ${ringColor}, #a855f7, #ec4899, ${ringColor})`;
+    }
 
     const elName = document.getElementById('hud-charname');
     if (elName) elName.textContent = a.name;
+
+    // V1.09: Class badge in hero card
+    const elClass = document.getElementById('hud-class-badge');
+    if (elClass) elClass.textContent = getClassName(a.level, a);
 
     const elLvl = document.getElementById('hud-level');
     if (elLvl) elLvl.textContent = a.level;
@@ -914,12 +999,31 @@ function refreshHUD() {
     const elStreak = document.getElementById('streak-val');
     if (elStreak) elStreak.textContent = a.consecutiveLogins;
 
-    // V1.05: Streak badge in HUD
+    // V1.09: Inline streak in hero card
+    const streakInline = document.getElementById('hud-streak-inline');
+    if (streakInline && typeof EchoStreak !== 'undefined') {
+        const status = EchoStreak.checkStreakStatus(a);
+        const count = status.streakCount || 0;
+        if (count > 0) {
+            const fireColor = count >= 30 ? '#FFD700' : count >= 7 ? '#FF6B00' : '#FF4757';
+            streakInline.innerHTML = `<span style="color:${fireColor}">🔥 ${count}天</span>`;
+            streakInline.style.background = `rgba(255,107,0,0.1)`;
+            streakInline.style.padding = '2px 10px';
+            streakInline.style.borderRadius = '20px';
+        } else {
+            streakInline.innerHTML = '';
+            streakInline.style.background = 'none';
+            streakInline.style.padding = '0';
+        }
+    }
+
+    // V1.05: Streak badge (hidden, kept for compatibility)
     const streakBadgeEl = document.getElementById('hud-streak-badge');
     if (streakBadgeEl && typeof EchoStreak !== 'undefined') {
         streakBadgeEl.innerHTML = EchoStreak.renderStreakBadge(a);
     }
 
+    // XP bar
     const xpCur = xpForLevel(a.level);
     const xpNxt = xpForLevel(a.level + 1);
     const pct = xpNxt > xpCur ? ((a.totalXP - xpCur) / (xpNxt - xpCur)) * 100 : 100;
@@ -932,6 +1036,15 @@ function refreshHUD() {
 
     const elXpNxt = document.getElementById('xp-next');
     if (elXpNxt) elXpNxt.textContent = a.level >= LEVEL_CAP ? 'MAX' : `→ Lv.${a.level + 1}`;
+
+    // V1.09: HP bar
+    const maxHP = a.maxHP || (50 + a.level * 10);
+    const curHP = a.currentHP != null ? a.currentHP : maxHP;
+    const hpPct = maxHP > 0 ? (curHP / maxHP) * 100 : 100;
+    const elHpFill = document.getElementById('hp-fill');
+    if (elHpFill) elHpFill.style.width = Math.min(hpPct, 100) + '%';
+    const elHpCur = document.getElementById('hp-current');
+    if (elHpCur) elHpCur.textContent = `${curHP} / ${maxHP}`;
 
     // Guild badge in home profile
     const guildBadge = document.getElementById('hud-guild-badge');
@@ -1102,12 +1215,14 @@ function refreshProfile() {
     }
 
     renderAchievements();
+
+    // V1.09: Populate inline account fields (merged from screen-account)
+    openAccountSettings();
 }
 
+// V1.09: openAccountSettings now just refreshes inline fields (no navigation)
 function openAccountSettings() {
-    showScreen('screen-account');
     const a = me(); if (!a) return;
-    // Populate account fields
     const elName = document.getElementById('acc-username');
     const elAge = document.getElementById('acc-age');
     const elEmail = document.getElementById('acc-email');
@@ -1126,13 +1241,18 @@ function openAccountSettings() {
     if (elLoc) elLoc.textContent = a.location || '尚未設定';
 }
 
+// V1.09: Job Change with ceremony — alias to trigger overlay
+function openJobChangeOverlay() {
+    openCharPresetPicker();
+}
+
 function editUsername() {
     const a = me(); if (!a) return;
     const newName = prompt('請輸入新的冒險者名稱：', a.name || '');
     if (newName !== null && newName.trim() !== '') {
         a.name = newName.trim();
         saveGlobal();
-        openAccountSettings();
+        refreshProfile();
         refreshHUD();
         showToast('名稱已更新為「' + a.name + '」！');
     }

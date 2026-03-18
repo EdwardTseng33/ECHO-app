@@ -331,20 +331,41 @@
 
         <!-- ===== HOME (TASK WALL) ===== -->
         <div class="screen hidden" id="screen-home">
-            <!-- Compact HUD Bar -->
-            <div class="home-hud-bar">
-                <div class="home-hud-avatar" id="hud-char-icon">🧙</div>
-                <div class="home-hud-info">
-                    <div class="home-hud-name"><span id="hud-charname">冒險者</span></div>
-                    <div class="home-hud-xp-row">
-                        <span class="home-hud-level" id="hud-level-badge"><i class="ph-fill ph-star"></i> Lv.<span id="hud-level">1</span></span>
-                        <div class="home-hud-xp-track">
-                            <div class="home-hud-xp-fill" id="xp-fill"></div>
+            <!-- V1.09: Character Hero Card (25-30% viewport) -->
+            <div class="home-hero-card" onclick="nav('screen-character', document.querySelector('[aria-label=&quot;冒險者&quot;]')); refreshProfile()">
+                <div class="home-hero-top">
+                    <div class="home-hero-avatar-wrap">
+                        <div class="home-hero-avatar-ring" id="hud-avatar-ring">
+                            <div class="home-hero-avatar" id="hud-char-icon">🧙</div>
                         </div>
-                        <span class="home-hud-xp-text" id="xp-current">0/50</span>
+                    </div>
+                    <div class="home-hero-info">
+                        <div class="home-hero-name" id="hud-charname">冒險者</div>
+                        <div class="home-hero-class" id="hud-class-badge">見習冒險者</div>
+                        <div class="home-hero-meta">
+                            <span class="home-hero-level" id="hud-level-badge"><i class="ph-fill ph-star"></i> Lv.<span id="hud-level">1</span></span>
+                            <span class="home-hero-coins"><i class="ph-bold ph-coin"></i> <span id="hud-points">0</span></span>
+                            <span class="home-hero-streak" id="hud-streak-inline"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="home-hud-coins"><i class="ph-bold ph-coin"></i> <span id="hud-points">0</span></div>
+                <div class="home-hero-bars">
+                    <div class="home-hero-bar-row">
+                        <span class="home-hero-bar-label"><i class="ph-fill ph-lightning"></i> XP</span>
+                        <div class="home-hero-bar-track">
+                            <div class="home-hero-bar-fill home-hero-bar-xp" id="xp-fill"></div>
+                        </div>
+                        <span class="home-hero-bar-text" id="xp-current">0 / 50</span>
+                    </div>
+                    <div class="home-hero-bar-row">
+                        <span class="home-hero-bar-label"><i class="ph-fill ph-heart"></i> HP</span>
+                        <div class="home-hero-bar-track">
+                            <div class="home-hero-bar-fill home-hero-bar-hp" id="hp-fill"></div>
+                        </div>
+                        <span class="home-hero-bar-text" id="hp-current">100%</span>
+                    </div>
+                </div>
+                <div class="home-hero-tap-hint"><i class="ph ph-caret-right"></i></div>
             </div>
             <!-- Hidden elements for JS compatibility -->
             <span id="xp-next" class="hidden"></span>
@@ -353,7 +374,7 @@
             <span id="hud-def" class="hidden">0</span>
             <div id="hud-guild-badge" class="hidden"></div>
             <div id="hud-streak-badge" class="hidden"></div>
-            <div id="home-char-bubble" class="hidden"></div>
+            <div id="hud-char-bubble" class="hidden"></div>
 
             <!-- Quick Actions Row: Battle + Wheel -->
             <div class="home-actions-row">
@@ -693,19 +714,78 @@
                 <div class="equip-empty-msg">尚未裝備任何物品</div>
             </div>
 
-            <!-- ===== 4. ALL SETTINGS (UNIFIED MENU) ===== -->
+            <!-- ===== 4. UNIFIED SETTINGS (V1.09: merged account + character) ===== -->
+            <div class="section-header">
+                <h2>冒險者設定</h2>
+                <div></div>
+            </div>
             <div class="menu-list">
-                <div class="menu-item" onclick="openAccountSettings()">
-                    <i class="ph-fill ph-user-gear menu-icon-primary"></i> 冒險者檔案設定
-                    <span class="menu-right">設定 <i class="ph ph-caret-right"></i></span>
+                <div class="menu-item" onclick="openJobChangeOverlay()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-sword" style="color:#6366f1"></i> 轉職（更換職業）
+                    </div>
+                    <span class="menu-right">選擇 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="document.getElementById('avatar-input-profile').click()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-camera" style="color:#34d399"></i> 上傳自訂頭像
+                    </div>
+                    <span class="menu-right">修改 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="editUsername()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-user-circle" style="color:var(--primary)"></i> 修改暱稱
+                    </div>
+                    <span class="menu-right"><span id="acc-username" style="color:var(--text); font-weight:800;">冒險者</span> <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="editAge()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-cake" style="color:#F59E0B"></i> 年齡
+                    </div>
+                    <span class="menu-right"><span id="acc-age" style="color:var(--text); font-weight:800;">10</span> 歲 <i class="ph ph-caret-right"></i></span>
                 </div>
                 <div class="menu-item" onclick="showScreen('screen-dashboard')">
-                    <i class="ph-fill ph-chart-bar menu-icon-amber"></i> 任務回顧
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-chart-bar" style="color:#F59E0B"></i> 任務回顧
+                    </div>
                     <span class="menu-right">統計 <i class="ph ph-caret-right"></i></span>
                 </div>
                 <div class="menu-item" onclick="showScreen('screen-subscription')">
-                    <i class="ph-fill ph-crown menu-icon-gold"></i> 我的訂閱
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-crown" style="color:#FFD700"></i> 我的訂閱
+                    </div>
                     <span class="menu-right" id="menu-sub-label">免費版 <i class="ph ph-caret-right"></i></span>
+                </div>
+            </div>
+            <!-- Account / System Settings -->
+            <div class="section-header" style="margin-top:8px;">
+                <h2>帳號與系統</h2>
+                <div></div>
+            </div>
+            <div class="menu-list">
+                <div class="menu-item" style="cursor:default; background:var(--bg);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-envelope-simple" style="color:var(--text2)"></i> Email
+                    </div>
+                    <span class="menu-right" id="acc-email" style="font-size:13px; color:var(--text2); font-family:monospace;">user@echo.com</span>
+                </div>
+                <div class="menu-item" onclick="toggleGoogleBind()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-google-logo" style="color:#DB4437"></i> Google 綁定
+                    </div>
+                    <span class="menu-right" id="acc-google-status" style="color:var(--text3);">未連結 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="changePasswordFlow()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-lock-key" style="color:#a855f7"></i> 變更密碼
+                    </div>
+                    <span class="menu-right">設定 <i class="ph ph-caret-right"></i></span>
+                </div>
+                <div class="menu-item" onclick="editLocation()">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="ph-fill ph-map-pin" style="color:#10b981"></i> 所在地
+                    </div>
+                    <span class="menu-right"><span id="acc-location" style="color:var(--primary); font-weight:700;">台灣, 台北</span> <i class="ph ph-caret-right"></i></span>
                 </div>
             </div>
 
@@ -726,7 +806,7 @@
                         <span class="app-footer-sep">|</span>
                         <a href="#">與我們聯繫</a>
                     </div>
-                    <div class="app-footer-version">ECHO 回聲 V1.03 (Build 20260301)</div>
+                    <div class="app-footer-version">ECHO 回聲 V1.09 (Build 20260316)</div>
                 </div>
             </div>
         </div>
@@ -1104,7 +1184,7 @@
         </nav>
 
         <!-- Version Tag -->
-        <div class="version-tag">V1.08</div>
+        <div class="version-tag">V1.09</div>
     </div>
 
     <!-- Firebase Modules (must load before app.js) -->
