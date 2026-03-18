@@ -1066,7 +1066,7 @@ function refreshProfile() {
     const bigEl = document.getElementById('prof-char');
     const bubbleEl = document.getElementById('prof-char-bubble');
     if (bigEl) {
-        bigEl.innerHTML = getCharImg(a, 110, a.level, false);
+        bigEl.innerHTML = getCharImg(a, 80, a.level, false);
         bigEl.className = 'char-big';
         bigEl.style.cursor = 'pointer';
         bigEl.onclick = () => {
@@ -1197,19 +1197,8 @@ function refreshProfile() {
         }
     }
 
-    // Guild badge under character name in profile
-    const profClassBadge = document.getElementById('prof-class-badge');
-    if (profClassBadge) {
-        const guild = a.guildId && globalData.guilds ? globalData.guilds[a.guildId] : null;
-        let badgeHtml = `⭐ Lv.${a.level} ${cn} `;
-        if (guild) {
-            const member = guild.members.find(m => m.id === globalData.activeId);
-            const roleTitle = member ? member.roleTitle || '成員' : '成員';
-            badgeHtml += ` <span class="guild-inline-badge" style="margin-left:6px;margin-top:0;">${guild.icon} ${guild.name}</span> `;
-        }
-        profClassBadge.innerHTML = badgeHtml;
-        profClassBadge.style.color = getClassColor(a.level);
-    }
+    // Class badge — show only class name, no Lv or guild (avoid badge-in-badge)
+    // Level is already shown in profile-stats; guild has its own card below
 
     renderAchievements();
 

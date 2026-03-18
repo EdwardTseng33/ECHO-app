@@ -461,17 +461,7 @@ body::before {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.task-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 16px;
-    bottom: 16px;
-    width: 4px;
-    background: var(--primary);
-    border-radius: 0 4px 4px 0;
-    opacity: 1;
-}
+/* task-card left accent removed for cleaner look */
 
 .task-type {
     display: inline-flex;
@@ -1177,54 +1167,54 @@ body::before {
 /* CHARACTER PROFILE REDESIGN */
 .char-profile {
     text-align: center;
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 24px 20px 20px;
+    background: linear-gradient(180deg, rgba(99,102,241,0.04) 0%, transparent 100%);
 }
 
 .char-profile-avatar-container {
     position: relative;
-    width: 110px;
-    height: 110px;
-    margin: 0 auto 12px;
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 14px;
 }
 
 .char-profile-avatar {
-    width: 110px;
-    height: 110px;
+    width: 88px;
+    height: 88px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
+    background: var(--surface);
     position: relative;
     z-index: 2;
     overflow: hidden;
     border: 3px solid var(--border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .char-profile-avatar img {
-    width: 85%;
-    height: 85%;
+    width: 88%;
+    height: 88%;
     object-fit: contain;
 }
 
 /* Avatar Edit Badge */
 .avatar-edit-badge {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 32px;
-    height: 32px;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
     background: var(--primary);
     color: white;
-    border: 3px solid #FFFFFF;
+    border: 2px solid var(--surface);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
     z-index: 10;
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -1234,7 +1224,7 @@ body::before {
 }
 
 .char-profile-avatar .char-big {
-    font-size: 60px;
+    font-size: 48px;
     animation: none;
 }
 
@@ -1398,73 +1388,87 @@ body::before {
 }
 
 .char-title {
-    font-size: var(--fs-display-sm);
+    font-size: var(--fs-heading);
     font-weight: 900;
-    margin-top: 8px
+    color: var(--text);
+    line-height: 1.2;
 }
 
 .char-subtitle {
     font-size: var(--fs-body-sm);
     color: var(--secondary);
     font-weight: 800;
-    margin-top: 2px
+    margin-top: 2px;
 }
 
 .char-class-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: var(--fs-sm);
-    font-weight: 900;
-    padding: 5px 12px;
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    padding: 4px 14px;
     border-radius: var(--radius-pill);
-    background: linear-gradient(135deg, rgba(255, 215, 0, .2), rgba(255, 107, 0, .2));
+    background: rgba(99, 102, 241, 0.08);
     color: var(--primary);
-    border: 1px solid rgba(255, 215, 0, .3);
-    margin-top: 8px
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
 }
 
 /* PROFILE STATS */
 .profile-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    margin-bottom: 4px;
+    gap: 0;
+    margin: 0 20px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
 }
 
 .profile-stats .p-stat {
-    background: var(--bg);
-    padding: 14px 8px;
-    text-align: center
+    padding: 14px 6px;
+    text-align: center;
+    position: relative;
+}
+
+.profile-stats .p-stat + .p-stat::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: var(--border);
 }
 
 .p-stat .p-val {
     font-size: var(--fs-heading);
     font-weight: 900;
     display: block;
-    color: var(--primary)
+    color: var(--primary);
+    font-family: var(--font);
 }
 
 .p-stat .p-label {
-    font-size: var(--fs-sm);
-    color: var(--text2);
-    font-weight: 800;
+    font-size: 10px;
+    color: var(--text3);
+    font-weight: 700;
     letter-spacing: .3px;
-    margin-top: 4px
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
 }
 
-.p-stat-atk .p-val,
-.p-stat-atk .p-label {
-    color: #FF6B00;
-}
-.p-stat-atk .p-label { font-weight: 900 }
+.p-stat-atk .p-val { color: #FF6B00; }
+.p-stat-atk .p-label { color: #FF6B00; font-weight: 800; }
 
-.p-stat-def .p-val,
-.p-stat-def .p-label {
-    color: #00E5FF;
-}
-.p-stat-def .p-label { font-weight: 900 }
+.p-stat-def .p-val { color: #00BCD4; }
+.p-stat-def .p-label { color: #00BCD4; font-weight: 800; }
 
 /* ACHIEVEMENT WALL */
 .ach-grid {
@@ -3099,24 +3103,7 @@ select:focus {
     backdrop-filter: blur(8px)
 }
 
-/* Profile stats — add subtle separators */
-.profile-stats {
-    position: relative
-}
-
-.p-stat {
-    position: relative
-}
-
-.p-stat+.p-stat::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 20%;
-    height: 60%;
-    width: 1px;
-    background: rgba(255, 255, 255, .1)
-}
+/* Profile stats separators — handled in main definition */
 
 /* Battle arena — better visual hierarchy */
 .battle-arena {
