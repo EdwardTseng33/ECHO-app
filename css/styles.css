@@ -182,10 +182,10 @@ body::before {
     z-index: 0
 }
 
-/* Tab screens without topbar — add safe area top padding */
+/* Tab screens without topbar — safe area + breathing room */
 #screen-mytasks,
 #screen-rewards {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
 }
 
 /* TOPBAR - UI/UX Refined */
@@ -627,7 +627,7 @@ body::before {
 .home-hero-card {
     position: relative;
     padding: 20px;
-    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
     background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(168,85,247,0.06) 50%, rgba(236,72,153,0.04) 100%);
     border-bottom: 1px solid var(--border);
     cursor: pointer;
